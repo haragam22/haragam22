@@ -1,6 +1,6 @@
 <div align="center">
 
-# hey, I'm Har Agam 👋
+# Hey, I'm Har Agam Deep Singh 👋
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=20&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=B.Tech+CSE+%40+MAIT%2C+GGSIPU;Machine+Learning+%2B+Generative+AI+%2B+Backend;Multi-agent+RAG+%7C+Adversarial+ML+%7C+Mech+Interp;Currently%3A+chasing+an+AI%2FML+internship)](https://git.io/typing-svg)
 
