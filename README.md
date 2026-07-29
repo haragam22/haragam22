@@ -91,8 +91,10 @@ now = {
 
 <div align="center">
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0d1117?style=for-the-badge&logo=linkedin&logoColor=58A6FF&labelColor=161b22)](#)
-[![Email](https://img.shields.io/badge/Email-haragam.22%40gmail.com-0d1117?style=for-the-badge&logo=gmail&logoColor=58A6FF&labelColor=161b22)](mailto:haragam.22@gmail.com)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0d1117?style=for-the-badge&logo=linkedin&logoColor=58A6FF&labelColor=161b22)](https://www.linkedin.com/in/haragam-deep-singh)
+[![Email](https://img.shields.io/badge/Email-Reach%20out-0d1117?style=for-the-badge&logo=gmail&logoColor=58A6FF&labelColor=161b22)](mailto:haragam.22@gmail.com)
+[![GitHub](https://img.shields.io/badge/GitHub-Follow-0d1117?style=for-the-badge&logo=github&logoColor=58A6FF&labelColor=161b22)](https://github.com/haragam22)
+[![Kaggle](https://img.shields.io/badge/Kaggle-Profile-0d1117?style=for-the-badge&logo=kaggle&logoColor=58A6FF&labelColor=161b22)](https://www.kaggle.com/haragamdeepsingh)
 
 </div>
 
