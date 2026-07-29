@@ -35,19 +35,17 @@ har_agam = {
 ### `> stack`
 
 **Core**
-![Python](https://skillicons.dev/icons?i=python) ![C++](https://skillicons.dev/icons?i=cpp)
+<img src="https://skillicons.dev/icons?i=python,cpp" />
 
 **AI / ML**
-![PyTorch](https://skillicons.dev/icons?i=pytorch)
-`Deep Learning` `Reinforcement Learning` `NLP` `Computer Vision` `LLM fine-tuning` `RAG` `multi-agent systems` `transformers` `prompt engineering`
+<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" />
+<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" />
 
 **Backend & infra**
-![FastAPI](https://skillicons.dev/icons?i=fastapi) ![Django](https://skillicons.dev/icons?i=django) ![Docker](https://skillicons.dev/icons?i=docker) ![AWS](https://skillicons.dev/icons?i=aws)
-`vector databases` `WebSockets` `REST APIs`
+<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" />
 
 **Tools**
-![Git](https://skillicons.dev/icons?i=git) ![GitHub](https://skillicons.dev/icons?i=github)
-`MCP servers` `open-source contribution`
+<img src="https://skillicons.dev/icons?i=git,github,githubactions" />
 
 ---
 
