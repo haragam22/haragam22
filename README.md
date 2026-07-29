@@ -1,0 +1,103 @@
+<div align="center">
+
+# hey, I'm Har Agam 👋
+
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=20&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=B.Tech+CSE+%40+MAIT%2C+GGSIPU;Machine+Learning+%2B+Generative+AI+%2B+Backend;Multi-agent+RAG+%7C+Adversarial+ML+%7C+Mech+Interp;Currently%3A+chasing+an+AI%2FML+internship)](https://git.io/typing-svg)
+
+</div>
+
+---
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/neural-network.svg" width="100%" alt="an animated neural network forward pass — a wave of activation sweeps layer by layer, node brightness reflects each weight, and the output assembles into a picture at the end"/>
+
+<sub>live network, regenerated daily — <b>the hidden layers grow or shrink with how much I committed that day</b>, and what you're watching is an actual forward pass, not a loop of random flashes</sub>
+
+</div>
+
+---
+
+### `> whoami`
+
+```python
+har_agam = {
+    "role"      : "second-year B.Tech CSE, Maharaja Agrasen Institute of Technology (GGSIPU)",
+    "cgpa"      : 8.46,
+    "focus"     : ["ML/DL", "Generative AI", "backend systems", "adversarial ML", "mech interp"],
+    "leads"     : "backend & ML dev @ BYTE Society (2024 – present)",
+    "seeking"   : "AI/ML or GenAI internship — research-driven engineering, real problems",
+}
+```
+
+---
+
+### `> stack`
+
+**Core**
+![Python](https://skillicons.dev/icons?i=python) ![C++](https://skillicons.dev/icons?i=cpp)
+
+**AI / ML**
+![PyTorch](https://skillicons.dev/icons?i=pytorch)
+`Deep Learning` `Reinforcement Learning` `NLP` `Computer Vision` `LLM fine-tuning` `RAG` `multi-agent systems` `transformers` `prompt engineering`
+
+**Backend & infra**
+![FastAPI](https://skillicons.dev/icons?i=fastapi) ![Django](https://skillicons.dev/icons?i=django) ![Docker](https://skillicons.dev/icons?i=docker) ![AWS](https://skillicons.dev/icons?i=aws)
+`vector databases` `WebSockets` `REST APIs`
+
+**Tools**
+![Git](https://skillicons.dev/icons?i=git) ![GitHub](https://skillicons.dev/icons?i=github)
+`MCP servers` `open-source contribution`
+
+---
+
+### `> pinned.projects`
+
+| project | what it does | stack |
+|---|---|---|
+| **Devlens** — backend lead | AI codebase navigator: deterministic AST parsing + hybrid vector search mapping 500+ dependencies/issues; agentic backend explains architectural intent, cut onboarding time ~60% | `Python` `AST` `vector search` `LLMs` |
+| **Jal Drishti** — ML lead | real-time underwater CV surveillance, YOLOv8 + FUnIE-GAN, 89%+ mAP across 5 threat classes; dual-mode backend with <80ms WebSocket telemetry | `YOLOv8` `FUnIE-GAN` `WebSockets` |
+| **DebateMind** — backend & ML | autonomous AI debate framework, RL-optimized LLM reasoning backed by a real-time RAG pipeline for fact-checking | `RL` `RAG` `LLMs` |
+| **ClauseCraft AI** — project lead | multi-agent policy navigator (RAG + deterministic NLP validation), cut manual eligibility-check time ~70% across 10+ simultaneous docs | `RAG` `multi-agent` `NLP` |
+| **DropDrive** — backend research | MERN + C++ secure data-wiping tool, NIST SP 800-88 compliant; shortlisted, Smart India Hackathon | `MERN` `C++` |
+
+---
+
+### `> achievements`
+
+```python
+achievements = [
+    "Winner — Smartohack 3.0, R&D Dept MAIT (2026)         : Jal Drishti",
+    "1st Runner-Up — VisionX Hackathon, GfG/HackBriven (2026): Devlens",
+    "Winner — Verdict, Cognizance IIT Roorkee (2025)        : national debate",
+    "Winner — Founder's Gambit, E-Summit IIT BHU (2024)     : national business comp",
+    "1st Runner-Up — Research Quest, Research Society MAIT (2025)",
+]
+```
+
+---
+
+### `> currently`
+
+```python
+now = {
+    "building" : "multi-agent + adversarial ML systems",
+    "reading"  : "mech interp papers",
+    "goal"     : "land an AI/ML or GenAI internship, ship something that outlasts the semester",
+}
+```
+
+---
+
+### `> contact.init()`
+
+<div align="center">
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0d1117?style=for-the-badge&logo=linkedin&logoColor=58A6FF&labelColor=161b22)](#)
+[![Email](https://img.shields.io/badge/Email-haragam.22%40gmail.com-0d1117?style=for-the-badge&logo=gmail&logoColor=58A6FF&labelColor=161b22)](mailto:haragam.22@gmail.com)
+
+</div>
+
+<div align="center">
+<sub><code>// backend by day, gradients by night</code></sub>
+</div>
