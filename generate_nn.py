@@ -489,12 +489,9 @@ def _esc(text):
 # + ground scene rather than a bare dark background.
 # ---------------------------------------------------------------------------
 
-# streak -> pieces assembled mapping: one piece per streak day, capped at 6
-# (engine, lower body, upper body/stripe, nose, fins, nose cap). streak 0 or 1
-# day -> empty pad. streak >= 6 -> fully built. tune ROCKET_PIECE_CAP to
-# change how many days it takes to "complete" the rocket.
-ROCKET_PIECE_CAP = 6
-
+# the rocket itself (engine, fins, body, nose, cap) always assembles fully
+# every loop - the only thing tied to real GitHub activity is the pair of
+# side-engine boosters, which only show up when there's a current streak.
 SKY_TOP = "#0b1e3d"
 SKY_HORIZON = "#5b7fb0"
 OUTLINE = "#12100b"
@@ -513,10 +510,6 @@ ROCKET_DARK = "#3a3a3a"
 FLAME_A = "#ffd23f"
 FLAME_B = "#ff6b35"
 SMOKE_COLOR = "#d8d8d8"
-
-
-def pieces_for_streak(streak):
-    return max(0, min(streak, ROCKET_PIECE_CAP))
 
 
 def _stepped_anim(attr, cycle, breakpoints, tag="animate", extra=""):
@@ -558,8 +551,6 @@ def _build_cloud(cx, cy, scale=1.0):
 
 
 def build_rocket(streak):
-    n_pieces = pieces_for_streak(streak)
-
     w, h = 800, 450
     cycle = 14.0
     # assembly -> ignite/ascend -> hold offscreen -> end card -> reset
@@ -635,11 +626,7 @@ def build_rocket(streak):
 
     def piece_engine():
         y = engine_y
-        return (
-            _outlined_rect(pad_x - body_w/2, y, body_w, 34, ROCKET_DARK)
-            + _outlined_poly(f"{pad_x-body_w/2-10},{y+34} {pad_x-body_w/2+10},{y+34} {pad_x-body_w/2+2},{y+8}", ROCKET_RED)
-            + _outlined_poly(f"{pad_x+body_w/2+10},{y+34} {pad_x+body_w/2-10},{y+34} {pad_x+body_w/2-2},{y+8}", ROCKET_RED)
-        )
+        return _outlined_rect(pad_x - body_w/2, y, body_w, 34, ROCKET_DARK)
 
     def piece_lower_body():
         y = lower_y
@@ -652,6 +639,36 @@ def build_rocket(streak):
             _outlined_rect(pad_x - body_w/2, y + 8, body_w, 8, ROCKET_RED) + \
             f'<circle cx="{pad_x}" cy="{y+34}" r="12" fill="{SKY_TOP}" stroke="{OUTLINE}" stroke-width="2"/>'
 
+    def piece_side_engines():
+        # strap-on boosters: nozzle at the bottom (ground-aligned), dark engine
+        # casing above it, then a white body running most of the way up
+        # alongside the main body - total length is 3/5 of the rocket's height
+        rocket_total_h = engine_h + lower_h + upper_h + nose_h + cap_h
+        booster_h = round(rocket_total_h * 3 / 5)
+        nozzle_h, dark_h = 14, 26
+        white_h = booster_h - nozzle_h - dark_h
+        segs = []
+        for side in (-1, 1):
+            bx = pad_x + side * (body_w/2 + 12)
+            dark_top = ground_y - nozzle_h - dark_h
+            white_top = ground_y - booster_h
+            segs.append(_outlined_poly(f"{bx-8},{ground_y-nozzle_h} {bx+8},{ground_y-nozzle_h} {bx},{ground_y}", ROCKET_RED))
+            segs.append(_outlined_rect(bx - 8, dark_top, 16, dark_h, ROCKET_DARK))
+            segs.append(_outlined_rect(bx - 8, white_top, 16, white_h, ROCKET_WHITE))
+            segs.append(_outlined_rect(bx - 8, white_top + white_h - 10, 16, 6, ROCKET_BLUE))
+        return "".join(segs)
+
+    def piece_cap():
+        y = cap_y
+        return _outlined_poly(f"{pad_x-6},{y+26} {pad_x+6},{y+26} {pad_x},{y}", ROCKET_WHITE)
+
+    def piece_fins():
+        y = engine_y
+        return (
+            _outlined_poly(f"{pad_x-body_w/2-10},{y+34} {pad_x-body_w/2+10},{y+34} {pad_x-body_w/2+2},{y+8}", ROCKET_RED)
+            + _outlined_poly(f"{pad_x+body_w/2+10},{y+34} {pad_x+body_w/2-10},{y+34} {pad_x+body_w/2-2},{y+8}", ROCKET_RED)
+        )
+
     def piece_nose():
         y = nose_y
         # stepped-triangle taper: 3 shrinking bands instead of a smooth curve
@@ -662,24 +679,12 @@ def build_rocket(streak):
             sy -= sh
         return "".join(segs)
 
-    def piece_cap():
-        y = cap_y
-        return _outlined_poly(f"{pad_x-6},{y+26} {pad_x+6},{y+26} {pad_x},{y}", ROCKET_WHITE)
+    # every core piece always assembles the same way - streak only controls
+    # whether the side-engine boosters show up (see below)
+    static_pieces = [piece_engine, piece_fins, piece_lower_body, piece_upper_body, piece_nose, piece_cap]
+    n_slots = len(static_pieces) + 1  # +1 slot reserved for the streak-gated boosters
 
-    piece_defs = [
-        ("engine", piece_engine),
-        ("lower body", piece_lower_body),
-        ("upper body", piece_upper_body),
-        ("nose", piece_nose),
-        ("fins", None),  # rendered with the engine block above, counts as a build step
-        ("cap", piece_cap),
-    ]
-
-    rocket_children = []
-    for i, (name, builder) in enumerate(piece_defs):
-        if i >= n_pieces or builder is None:
-            continue
-        appear_t = (i + 1) * (t_assembly_end / (ROCKET_PIECE_CAP + 1))
+    def _drop_in(appear_t, drawn):
         drop_dy = -80
         translate_anim = _stepped_anim(
             "transform", cycle,
@@ -687,7 +692,18 @@ def build_rocket(streak):
             tag="animateTransform", extra='type="translate"',
         )
         opacity_anim = _stepped_anim("opacity", cycle, [(0.0, "0"), (appear_t, "0"), (appear_t + 0.01, "1")])
-        rocket_children.append(f'<g opacity="0">{opacity_anim}<g>{translate_anim}{builder()}</g></g>')
+        return f'<g opacity="0">{opacity_anim}<g>{translate_anim}{drawn}</g></g>'
+
+    rocket_children = []
+    for i, builder in enumerate(static_pieces):
+        appear_t = (i + 1) * (t_assembly_end / n_slots)
+        rocket_children.append(_drop_in(appear_t, builder()))
+
+    # side-engine boosters: the one piece actually tied to real GitHub
+    # activity - only show up once there's a current streak
+    if streak > 0:
+        boosters_appear_t = (len(static_pieces) + 1) * (t_assembly_end / n_slots)
+        rocket_children.append(_drop_in(boosters_appear_t, piece_side_engines()))
 
     # engine flame: attached to the rocket group so it climbs with it, visible
     # and flickering for the whole ascent (not just the ignition instant)
@@ -782,7 +798,7 @@ def main():
             f.write(svg)
     print(f"today's contributions: {commits_today} -> layer sizes {sizes}")
     print(f"30-day chart points: {len(last_30)}, repos: {len(repos)}")
-    print(f"current streak: {streak} -> rocket pieces {pieces_for_streak(streak)}/{ROCKET_PIECE_CAP}")
+    print(f"current streak: {streak} -> side-engine boosters {'on' if streak > 0 else 'off'}")
 
 
 if __name__ == "__main__":
