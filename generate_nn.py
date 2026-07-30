@@ -52,10 +52,11 @@ DUST_COUNT = 75
 DUST_MIN_PERIOD, DUST_MAX_PERIOD = 3.0, 7.0
 
 
-def get_todays_contributions():
+def _fetch_contribution_days():
+    """Returns list of {date, contributionCount} dicts, oldest first, or [] on failure."""
     if not TOKEN or not USERNAME:
-        print("warning: GH_PAT/GH_USERNAME not set, defaulting to 0 contributions")
-        return 0
+        print("warning: GH_PAT/GH_USERNAME not set, defaulting to empty calendar")
+        return []
     query = """
     query($login: String!) {
       user(login: $login) {
@@ -78,14 +79,25 @@ def get_todays_contributions():
         data = resp.json()
         weeks = data["data"]["user"]["contributionsCollection"]["contributionCalendar"]["weeks"]
     except Exception as exc:
-        print(f"warning: contribution lookup failed ({exc}), defaulting to 0")
-        return 0
+        print(f"warning: contribution lookup failed ({exc}), defaulting to empty calendar")
+        return []
+    days = [d for week in weeks for d in week["contributionDays"]]
+    days.sort(key=lambda d: d["date"])
+    return days
+
+
+def get_todays_contributions():
+    days = _fetch_contribution_days()
     today = datetime.date.today().isoformat()
-    for week in weeks:
-        for day in week["contributionDays"]:
-            if day["date"] == today:
-                return day["contributionCount"]
+    for day in days:
+        if day["date"] == today:
+            return day["contributionCount"]
     return 0
+
+
+def get_last_30_days_contributions():
+    days = _fetch_contribution_days()
+    return days[-30:]
 
 
 def layer_sizes(commits):
@@ -282,14 +294,327 @@ def build_svg(sizes):
     return "\n".join(parts)
 
 
+# ---------------------------------------------------------------------------
+# Telemetry: 30-day contribution chart
+# ---------------------------------------------------------------------------
+
+def build_contribution_chart(days):
+    if not days:
+        today = datetime.date.today()
+        days = [{"date": (today - datetime.timedelta(days=29 - i)).isoformat(), "contributionCount": 0} for i in range(30)]
+    w, h = 760, 240
+    pad_l, pad_r, pad_t, pad_b = 40, 20, 40, 30
+    plot_w = w - pad_l - pad_r
+    plot_h = h - pad_t - pad_b
+    counts = [d["contributionCount"] for d in days] or [0]
+    max_c = max(max(counts), 1)
+
+    n = len(days)
+    xs = [pad_l + (plot_w * i / max(n - 1, 1)) for i in range(n)]
+    ys = [pad_t + plot_h - (plot_h * c / max_c) for c in counts]
+
+    line_pts = " ".join(f"{x:.1f},{y:.1f}" for x, y in zip(xs, ys))
+    area_pts = f"{xs[0]:.1f},{pad_t+plot_h:.1f} " + line_pts + f" {xs[-1]:.1f},{pad_t+plot_h:.1f}"
+
+    parts = [
+        f'<svg width="100%" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg">',
+        f'<rect width="{w}" height="{h}" fill="{BG}"/>',
+        f'<text x="{pad_l}" y="24" font-family="monospace" font-size="13" letter-spacing="2" '
+        f'fill="#e6edf3">CONTRIBUTION TELEMETRY</text>',
+    ]
+
+    # gridlines: 4 horizontal
+    for i in range(5):
+        gy = pad_t + plot_h * i / 4
+        parts.append(f'<line x1="{pad_l}" y1="{gy:.1f}" x2="{w-pad_r}" y2="{gy:.1f}" stroke="#21262d" stroke-width="1"/>')
+        val = round(max_c * (4 - i) / 4)
+        parts.append(f'<text x="{pad_l-8}" y="{gy+3:.1f}" font-family="monospace" font-size="8" fill="{LABEL_COLOR}" text-anchor="end">{val}</text>')
+
+    # x-axis day-of-month labels, sparse to avoid crowding
+    step = max(n // 8, 1)
+    for i, d in enumerate(days):
+        if i % step != 0 and i != n - 1:
+            continue
+        day_num = int(d["date"].split("-")[-1])
+        parts.append(f'<text x="{xs[i]:.1f}" y="{h-8}" font-family="monospace" font-size="8" fill="{LABEL_COLOR}" text-anchor="middle">{day_num}</text>')
+
+    parts.append(f'<polygon points="{area_pts}" fill="#58a6ff" fill-opacity="0.12"/>')
+    parts.append(f'<polyline points="{line_pts}" fill="none" stroke="#e6edf3" stroke-width="1.5"/>')
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Telemetry: core repo/language panel
+# ---------------------------------------------------------------------------
+
+def _fetch_user_repos():
+    if not TOKEN or not USERNAME:
+        print("warning: GH_PAT/GH_USERNAME not set, defaulting to empty repo list")
+        return []
+    repos, page = [], 1
+    try:
+        while True:
+            resp = requests.get(
+                f"https://api.github.com/users/{USERNAME}/repos",
+                params={"per_page": 100, "page": page},
+                headers={"Authorization": f"token {TOKEN}"},
+                timeout=30,
+            )
+            resp.raise_for_status()
+            batch = resp.json()
+            repos.extend(batch)
+            if len(batch) < 100:
+                break
+            page += 1
+    except Exception as exc:
+        print(f"warning: repo list lookup failed ({exc}), defaulting to empty list")
+        return []
+    return repos
+
+
+def _fetch_last_commit_date(repos):
+    # ponytail: checks only the most-recently-pushed repo, not every repo's commit history
+    if not repos:
+        return None
+    latest_repo = max(repos, key=lambda r: r.get("pushed_at") or "")
+    pushed_at = latest_repo.get("pushed_at")
+    return pushed_at
+
+
+# crude heuristic: majority language across repos maps to a domain label.
+# genuinely fuzzy - good enough for a vibe, not a resume claim.
+_DOMAIN_MAP = {
+    "Python": "Machine Learning & Backend",
+    "Jupyter Notebook": "Machine Learning & Data Science",
+    "JavaScript": "Web & Frontend",
+    "TypeScript": "Web & Frontend",
+    "Go": "Systems & Backend",
+    "Rust": "Systems Programming",
+    "C++": "Systems Programming",
+    "C": "Systems Programming",
+    "Java": "Backend & Enterprise",
+    "C#": "Backend & Tools",
+    "HTML": "Web & Frontend",
+    "Swift": "Mobile Development",
+    "Kotlin": "Mobile Development",
+    "Shell": "Tooling & DevOps",
+}
+
+
+def _language_breakdown(repos):
+    counts = {}
+    for r in repos:
+        lang = r.get("language")
+        if lang:
+            counts[lang] = counts.get(lang, 0) + 1
+    total = sum(counts.values()) or 1
+    ranked = sorted(counts.items(), key=lambda kv: kv[1], reverse=True)
+    return [(lang, cnt / total) for lang, cnt in ranked], ranked
+
+
+def build_core_telemetry(repos):
+    w, h = 760, 220
+    parts = [
+        f'<svg width="100%" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg">',
+        f'<rect width="{w}" height="{h}" fill="{BG}"/>',
+        f'<text x="20" y="28" font-family="monospace" font-size="13" letter-spacing="2" fill="#e6edf3">GITHUB CORE TELEMETRY</text>',
+        f'<line x1="{w/2:.0f}" y1="45" x2="{w/2:.0f}" y2="{h-15}" stroke="#21262d" stroke-width="1"/>',
+    ]
+
+    breakdown, ranked = _language_breakdown(repos)
+    primary_domain = _DOMAIN_MAP.get(ranked[0][0], ranked[0][0]) if ranked else "Exploring"
+
+    last_push = _fetch_last_commit_date(repos)
+    active = False
+    if last_push:
+        pushed = datetime.datetime.strptime(last_push, "%Y-%m-%dT%H:%M:%SZ").date()
+        active = (datetime.date.today() - pushed).days <= 14
+    commit_status = "Active Contributor" if active else "Between Commits"
+
+    left_fields = [
+        ("Total Repositories", str(len(repos))),
+        ("Primary Domain", primary_domain),
+        ("Commit Status", commit_status),
+        ("Profile Handle", f"@{USERNAME}" if USERNAME else "unknown"),
+    ]
+    ly = 65
+    for label, value in left_fields:
+        parts.append(f'<text x="20" y="{ly}" font-family="monospace" font-size="9" fill="{LABEL_COLOR}">{label}</text>')
+        parts.append(f'<text x="20" y="{ly+16}" font-family="monospace" font-size="12" fill="#e6edf3">{value}</text>')
+        ly += 40
+
+    rx = w / 2 + 30
+    ry = 65
+    bar_w_max = w - rx - 90
+    for lang, frac in breakdown[:4]:
+        pct = round(frac * 100)
+        parts.append(f'<text x="{rx:.0f}" y="{ry}" font-family="monospace" font-size="10" fill="#e6edf3">{lang}</text>')
+        bar_y = ry + 6
+        parts.append(f'<rect x="{rx:.0f}" y="{bar_y}" width="{bar_w_max}" height="6" fill="#21262d" rx="3"/>')
+        parts.append(f'<rect x="{rx:.0f}" y="{bar_y}" width="{bar_w_max*frac:.1f}" height="6" fill="#58a6ff" rx="3"/>')
+        parts.append(f'<text x="{rx+bar_w_max+8:.0f}" y="{bar_y+6}" font-family="monospace" font-size="9" fill="{LABEL_COLOR}">{pct}%</text>')
+        ry += 30
+
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
+# ---------------------------------------------------------------------------
+# Terminal mockup: animated git-log window
+# ---------------------------------------------------------------------------
+
+def _fetch_recent_commits(repos, limit=5):
+    if not TOKEN or not USERNAME or not repos:
+        return []
+    ranked = sorted(repos, key=lambda r: r.get("pushed_at") or "", reverse=True)[:8]
+    commits = []
+    for repo in ranked:
+        try:
+            resp = requests.get(
+                f"https://api.github.com/repos/{USERNAME}/{repo['name']}/commits",
+                params={"per_page": 3},
+                headers={"Authorization": f"token {TOKEN}"},
+                timeout=30,
+            )
+            resp.raise_for_status()
+            for c in resp.json():
+                msg = c["commit"]["message"].splitlines()[0][:52]
+                commits.append({"sha": c["sha"][:7], "repo": repo["name"], "msg": msg})
+        except Exception as exc:
+            print(f"warning: commit lookup failed for {repo.get('name')} ({exc})")
+        if len(commits) >= limit:
+            break
+    return commits[:limit]
+
+
+def _esc(text):
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def build_terminal(commits):
+    w, h = 760, 300
+    char_w, line_h = 7.2, 20
+    font = "SF Mono, Menlo, Consolas, monospace"
+    chrome_h = 32
+    pad_x, pad_y = 16, 20
+
+    if not commits:
+        commits = [{"sha": "0000000", "repo": "n/a", "msg": "no recent commits found"}]
+
+    lines = []
+    for c in commits:
+        prefix = f"* {c['sha']} "
+        bracket = f"[{c['repo']}] "
+        lines.append((prefix, bracket, c["msg"]))
+
+    prompt = f"{USERNAME or 'user'}@system ~/workspace $ git log --oneline --graph -n {len(commits)}"
+
+    type_speed = 0.02      # seconds per character
+    line_gap = 0.35        # pause between lines
+    cursor_period = 0.53
+    cycle = 18.0           # full retype loop period
+
+    parts = [
+        f'<svg width="100%" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg">',
+        '<defs>',
+        f'<filter id="term-shadow" x="-20%" y="-20%" width="140%" height="140%">'
+        f'<feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/></filter>',
+        '</defs>',
+        f'<rect width="{w}" height="{h}" fill="none"/>',
+        f'<rect x="4" y="4" width="{w-8}" height="{h-8}" rx="10" fill="#1e1e1e" filter="url(#term-shadow)"/>',
+        f'<rect x="4" y="4" width="{w-8}" height="{chrome_h}" rx="10" fill="#2b2b2b"/>',
+        f'<rect x="4" y="{4+chrome_h-10}" width="{w-8}" height="10" fill="#2b2b2b"/>',
+        '<circle cx="26" cy="20" r="6" fill="#ff5f56"/>',
+        '<circle cx="46" cy="20" r="6" fill="#ffbd2e"/>',
+        '<circle cx="66" cy="20" r="6" fill="#27c93f"/>',
+        f'<text x="{w/2:.0f}" y="24" font-family="{font}" font-size="12" fill="#9a9a9a" text-anchor="middle">'
+        f'{_esc(USERNAME or "user")}@system: ~/workspace</text>',
+    ]
+
+    ty = chrome_h + pad_y + 10
+    parts.append(
+        f'<text x="{pad_x}" y="{ty:.1f}" font-family="{font}" font-size="13" fill="#7ee787">$ '
+        f'<tspan fill="#e6edf3">{_esc(prompt.split("$ ",1)[1])}</tspan></text>'
+    )
+
+    t_cursor_start = 0.0
+    row_start_time = line_gap  # after prompt line
+    reveal_defs = []
+    max_chars_row = 0
+
+    for row_i, (prefix, bracket, msg) in enumerate(lines):
+        full = prefix + bracket + msg
+        max_chars_row = max(max_chars_row, len(full))
+        row_y = ty + line_h * (row_i + 1)
+        row_type_dur = len(full) * type_speed
+        row_end = row_start_time + row_type_dur
+
+        # clip-path reveal: rect grows left->right over the row's type duration
+        clip_id = f"clip{row_i}"
+        full_w = len(full) * char_w + 4
+        parts.append(
+            f'<clipPath id="{clip_id}"><rect x="{pad_x-2:.1f}" y="{row_y-14:.1f}" height="18" width="0">'
+            f'<animate attributeName="width" from="0" to="{full_w:.1f}" begin="{row_start_time:.2f}s" '
+            f'dur="{row_type_dur:.2f}s" fill="freeze"/>'
+            f'<animate attributeName="width" values="0;0" begin="{row_start_time+cycle:.2f}s" dur="0.01s" fill="freeze"/>'
+            f'</rect></clipPath>'
+        )
+        colored = (
+            f'<tspan fill="#ffa657">{_esc(prefix)}</tspan>'
+            f'<tspan fill="#7ee787">{_esc(bracket)}</tspan>'
+            f'<tspan fill="#e6edf3">{_esc(msg)}</tspan>'
+        )
+        parts.append(
+            f'<text clip-path="url(#{clip_id})" x="{pad_x}" y="{row_y:.1f}" font-family="{font}" font-size="13">{colored}</text>'
+        )
+        row_start_time = row_end + line_gap
+
+    last_row_y = ty + line_h * len(lines)
+    last_row_end = row_start_time - line_gap
+    cursor_x = pad_x + max_chars_row * char_w + 6
+
+    # blink indefinitely once typing settles, then everything resets via the outer cycle
+    parts.append(
+        f'<rect x="{cursor_x:.1f}" y="{last_row_y-12:.1f}" width="7" height="14" fill="#e6edf3" opacity="0">'
+        f'<animate attributeName="opacity" values="0;0;1;1;0" '
+        f'keyTimes="0;{min(last_row_end/cycle,0.999):.4f};{min(last_row_end/cycle,0.999):.4f};1;1" '
+        f'begin="0s" dur="{cycle:.2f}s" repeatCount="indefinite"/>'
+        f'<animate attributeName="opacity" values="1;0;1" dur="{cursor_period:.2f}s" '
+        f'begin="{last_row_end:.2f}s" repeatCount="indefinite"/>'
+        f'</rect>'
+    )
+
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
 def main():
-    commits = get_todays_contributions()
-    sizes = layer_sizes(commits)
-    svg = build_svg(sizes)
+    commits_today = get_todays_contributions()
+    sizes = layer_sizes(commits_today)
+    nn_svg = build_svg(sizes)
+
+    last_30 = get_last_30_days_contributions()
+    chart_svg = build_contribution_chart(last_30)
+
+    repos = _fetch_user_repos()
+    core_svg = build_core_telemetry(repos)
+
+    recent_commits = _fetch_recent_commits(repos)
+    terminal_svg = build_terminal(recent_commits)
+
     os.makedirs("dist", exist_ok=True)
-    with open("dist/neural-network.svg", "w") as f:
-        f.write(svg)
-    print(f"today's contributions: {commits} -> layer sizes {sizes}")
+    outputs = {
+        "dist/neural-network.svg": nn_svg,
+        "dist/contribution-telemetry.svg": chart_svg,
+        "dist/core-telemetry.svg": core_svg,
+        "dist/terminal.svg": terminal_svg,
+    }
+    for path, svg in outputs.items():
+        with open(path, "w", encoding="utf-8") as f:
+            f.write(svg)
+    print(f"today's contributions: {commits_today} -> layer sizes {sizes}")
+    print(f"30-day chart points: {len(last_30)}, repos: {len(repos)}, recent commits: {len(recent_commits)}")
 
 
 if __name__ == "__main__":

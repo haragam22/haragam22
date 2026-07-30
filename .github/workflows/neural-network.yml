@@ -1,4 +1,4 @@
-name: generate-neural-network
+name: generate-telemetry
 
 on:
   schedule:
@@ -23,7 +23,7 @@ jobs:
       - name: install deps
         run: pip install requests
 
-      - name: generate svg
+      - name: generate svgs
         env:
           GH_USERNAME: ${{ github.repository_owner }}
           GH_PAT: ${{ secrets.CONTRIB_READ_PAT }}
