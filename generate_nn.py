@@ -440,8 +440,8 @@ def build_core_telemetry(repos):
     ]
     ly = 65
     for label, value in left_fields:
-        parts.append(f'<text x="20" y="{ly}" font-family="monospace" font-size="9" fill="{LABEL_COLOR}">{label}</text>')
-        parts.append(f'<text x="20" y="{ly+16}" font-family="monospace" font-size="12" fill="#e6edf3">{value}</text>')
+        parts.append(f'<text x="20" y="{ly}" font-family="monospace" font-size="9" fill="{LABEL_COLOR}">{_esc(label)}</text>')
+        parts.append(f'<text x="20" y="{ly+16}" font-family="monospace" font-size="12" fill="#e6edf3">{_esc(value)}</text>')
         ly += 40
 
     rx = w / 2 + 30
@@ -449,7 +449,7 @@ def build_core_telemetry(repos):
     bar_w_max = w - rx - 90
     for lang, frac in breakdown[:4]:
         pct = round(frac * 100)
-        parts.append(f'<text x="{rx:.0f}" y="{ry}" font-family="monospace" font-size="10" fill="#e6edf3">{lang}</text>')
+        parts.append(f'<text x="{rx:.0f}" y="{ry}" font-family="monospace" font-size="10" fill="#e6edf3">{_esc(lang)}</text>')
         bar_y = ry + 6
         parts.append(f'<rect x="{rx:.0f}" y="{bar_y}" width="{bar_w_max}" height="6" fill="#21262d" rx="3"/>')
         parts.append(f'<rect x="{rx:.0f}" y="{bar_y}" width="{bar_w_max*frac:.1f}" height="6" fill="#58a6ff" rx="3"/>')

@@ -51,22 +51,18 @@ har_agam = {
 
 ### `> stack`
 
-<div align="center">
+**Core**
+<img src="https://skillicons.dev/icons?i=python,cpp" style="margin: 0 9px; vertical-align: middle;" />
 
-<h4>Core</h4>
-<img src="https://skillicons.dev/icons?i=python,cpp" style="margin: 0 9px;" />
+**AI / ML**
+<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" style="margin: 0 9px; vertical-align: middle;" />
+<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" style="margin: 0 9px; vertical-align: middle;" />
 
-<h4>AI / ML</h4>
-<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" style="margin: 0 9px;" />
-<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" style="margin: 0 9px;" />
+**Backend & infra**
+<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" style="margin: 0 9px; vertical-align: middle;" />
 
-<h4>Backend & infra</h4>
-<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" style="margin: 0 9px;" />
-
-<h4>Tools</h4>
-<img src="https://skillicons.dev/icons?i=git,github,githubactions" style="margin: 0 9px;" />
-
-</div>
+**Tools**
+<img src="https://skillicons.dev/icons?i=git,github,githubactions" style="margin: 0 9px; vertical-align: middle;" />
 
 ---
 
