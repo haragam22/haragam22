@@ -108,7 +108,7 @@ now = {
 ---
 
 <div align="center">
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/rocket.svg" width="420" alt="pixel-art rocket assembling from current GitHub streak, fueling, rolling out, and launching on loop" />
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/rocket.svg" width="100%" alt="pixel-art rocket assembling from current GitHub streak, then launching and flying off frame" />
 </div>
 
 ---

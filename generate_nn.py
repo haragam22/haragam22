@@ -482,25 +482,37 @@ def _esc(text):
 
 
 # ---------------------------------------------------------------------------
-# Isometric pixel-art rocket: assembles from streak length, fuels, rolls out,
+# Flat 2D pixel-art rocket scene: assembles from streak length, fuels,
 # launches, resets, loops. Native SMIL only (no <script>, same GitHub-README
-# constraint as everything else in this file).
+# constraint as everything else in this file). Front-on sprite style, not
+# isometric - stepped rectangles with black outlines, sitting in a full sky
+# + ground scene rather than a bare dark background.
 # ---------------------------------------------------------------------------
 
 # streak -> pieces assembled mapping: one piece per streak day, capped at 6
-# (nose, upper body, lower body, fins, engine, plus a top antenna/greeble).
-# streak 0 or 1 day -> bare gantry, no pieces. streak >= 6 -> fully built.
-# tune ROCKET_PIECE_CAP to change how many days it takes to "complete" the rocket.
+# (engine, lower body, upper body/stripe, nose, fins, nose cap). streak 0 or 1
+# day -> empty pad. streak >= 6 -> fully built. tune ROCKET_PIECE_CAP to
+# change how many days it takes to "complete" the rocket.
 ROCKET_PIECE_CAP = 6
 
-ROCKET_BG = "#0d1117"
-ROCKET_STRUCT = "#30363d"
-ROCKET_STRUCT_LIGHT = "#8b949e"
-ROCKET_BODY = "#c9d1d9"
-ROCKET_ACCENT = "#58a6ff"
-ROCKET_FLAME_A = "#ffd23f"
-ROCKET_FLAME_B = "#ff6b35"
-ROCKET_SMOKE = "#484f58"
+SKY_TOP = "#0b1e3d"
+SKY_HORIZON = "#5b7fb0"
+OUTLINE = "#12100b"
+STAR_COLOR = "#f5f6fa"
+CLOUD_COLOR = "#eef1f5"
+CLOUD_SHADE = "#c9d1d9"
+DIRT_COLOR = "#8a5a34"
+DIRT_EDGE = "#5e3b20"
+GRASS_COLOR = "#4c9a4a"
+GRASS_DARK = "#357536"
+ROCK_COLOR = "#7c8591"
+ROCKET_WHITE = "#f2f2ec"
+ROCKET_RED = "#d1453b"
+ROCKET_BLUE = "#3f7fd1"
+ROCKET_DARK = "#3a3a3a"
+FLAME_A = "#ffd23f"
+FLAME_B = "#ff6b35"
+SMOKE_COLOR = "#d8d8d8"
 
 
 def pieces_for_streak(streak):
@@ -526,139 +538,217 @@ def _stepped_anim(attr, cycle, breakpoints, tag="animate", extra=""):
     )
 
 
+def _outlined_rect(x, y, w, h, fill, sw=2):
+    return f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{fill}" stroke="{OUTLINE}" stroke-width="{sw}"/>'
+
+
+def _outlined_poly(points, fill, sw=2):
+    return f'<polygon points="{points}" fill="{fill}" stroke="{OUTLINE}" stroke-width="{sw}" stroke-linejoin="round"/>'
+
+
+def _build_cloud(cx, cy, scale=1.0):
+    puffs = [(-18, 6, 16, 10), (-4, 0, 20, 13), (14, 6, 15, 10), (0, 10, 30, 8)]
+    parts = []
+    for dx, dy, pw, ph in puffs:
+        x, y = cx + dx * scale, cy + dy * scale
+        parts.append(_outlined_rect(x, y, pw * scale, ph * scale, CLOUD_COLOR))
+    # small shaded underside for a bit of depth without breaking the flat look
+    parts.append(f'<rect x="{cx-14*scale:.1f}" y="{cy+12*scale:.1f}" width="{30*scale:.1f}" height="4" fill="{CLOUD_SHADE}"/>')
+    return "".join(parts)
+
+
 def build_rocket(streak):
     n_pieces = pieces_for_streak(streak)
 
-    w, h = 420, 320
+    w, h = 800, 450
     cycle = 14.0
-    t_assembly_end = cycle * 0.40
-    t_fuel_end = cycle * 0.55
-    t_rollout_end = cycle * 0.70
-    t_launch_end = cycle * 0.90
+    # assembly -> ignite/ascend -> hold offscreen -> end card -> reset
+    t_assembly_end = cycle * 0.35
+    t_ignite = t_assembly_end + 0.3
+    t_launch_end = cycle * 0.72       # rocket fully clear of the canvas by here
+    t_endcard_start = t_launch_end + 0.3
+    t_endcard_end = cycle * 0.93
     # reset phase fills the remainder of the cycle back to 1.0
 
-    gantry_x, ground_y = 110, 260
-    pad_x = 300  # where the crawler delivers the rocket for launch
-    rollout_dx = pad_x - gantry_x
+    ground_y = 380
+    pad_x = w / 2  # dead center
 
     parts = [
-        f'<svg width="100%" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg" '
-        f'shape-rendering="crispEdges">',
-        f'<rect width="{w}" height="{h}" fill="{ROCKET_BG}"/>',
-        f'<rect x="0" y="{ground_y+18}" width="{w}" height="{h-ground_y-18}" fill="#161b22"/>',
+        f'<svg width="100%" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">',
+        '<defs>',
+        f'<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">'
+        f'<stop offset="0%" stop-color="{SKY_TOP}"/><stop offset="100%" stop-color="{SKY_HORIZON}"/></linearGradient>',
+        '</defs>',
+        f'<rect width="{w}" height="{h}" fill="url(#sky)"/>',
     ]
 
-    # static gantry truss (assembly pad, left side)
-    parts.append(f'<g stroke="{ROCKET_STRUCT_LIGHT}" stroke-width="3" fill="none">')
-    parts.append(f'<line x1="{gantry_x-34}" y1="{ground_y+18}" x2="{gantry_x-34}" y2="{ground_y-160}"/>')
-    parts.append(f'<line x1="{gantry_x+34}" y1="{ground_y+18}" x2="{gantry_x+34}" y2="{ground_y-160}"/>')
-    for gy in range(ground_y - 150, ground_y + 10, 30):
-        parts.append(f'<line x1="{gantry_x-34}" y1="{gy}" x2="{gantry_x+34}" y2="{gy}"/>')
-    parts.append("</g>")
-
-    # launch pad marker (right side, blocky iso platform)
-    parts.append(
-        f'<polygon points="{pad_x-40},{ground_y+18} {pad_x+40},{ground_y+18} {pad_x+30},{ground_y+38} {pad_x-30},{ground_y+38}" '
-        f'fill="{ROCKET_STRUCT}"/>'
-    )
-
-    # rocket pieces, stacked bottom-up: engine, lower body, fins, upper body, nose, antenna
-    piece_h = 30
-    piece_defs = [
-        ("engine", ground_y, 20, ROCKET_STRUCT),
-        ("lower body", ground_y - piece_h, 18, ROCKET_BODY),
-        ("fins", ground_y - piece_h * 2, 26, ROCKET_ACCENT),
-        ("upper body", ground_y - piece_h * 2 - 20, 18, ROCKET_BODY),
-        ("nose", ground_y - piece_h * 3 - 20, 22, ROCKET_ACCENT),
-        ("antenna", ground_y - piece_h * 3 - 42, 8, ROCKET_STRUCT_LIGHT),
-    ]
-
-    rocket_children = []
-    for i, (name, y, half_w, color) in enumerate(piece_defs):
-        visible = i < n_pieces
-        appear_t = (i + 1) * (t_assembly_end / (ROCKET_PIECE_CAP + 1))
-        cy = y - 12
-        if not visible:
-            continue
-        drop_from = cy - 60
-        # piece drops into place then flashes white briefly on landing ("thunk")
-        translate_anim = _stepped_anim(
-            "transform", cycle,
-            [(0.0, f"translate(0,{drop_from-cy})"), (appear_t, f"translate(0,{drop_from-cy})"),
-             (appear_t + 0.35, "translate(0,0)")],
-            tag="animateTransform", extra='type="translate" additive="sum"',
+    # stars: independent async twinkle, same per-element random-phase pulse
+    # technique as the firefly dust field in build_dust()
+    for _ in range(26):
+        sx, sy = random.uniform(10, w - 10), random.uniform(14, 190)
+        period = random.uniform(1.8, 4.0)
+        phase = random.uniform(0, period)
+        peak = random.uniform(0.6, 1.0)
+        s = random.choice([2, 2, 3])
+        parts.append(
+            f'<rect x="{sx:.1f}" y="{sy:.1f}" width="{s}" height="{s}" fill="{STAR_COLOR}" opacity="0.15">'
+            f'<animate attributeName="opacity" values="0.15;{peak:.2f};0.15" keyTimes="0;0.5;1" '
+            f'dur="{period:.2f}s" begin="{phase:.2f}s" repeatCount="indefinite"/></rect>'
         )
-        opacity_anim = _stepped_anim(
-            "opacity", cycle,
-            [(0.0, "0"), (appear_t, "0"), (appear_t + 0.01, "1")],
-        )
-        flash_anim = _stepped_anim(
-            "opacity", cycle,
-            [(0.0, "0"), (appear_t + 0.35, "0"), (appear_t + 0.36, "0.9"), (appear_t + 0.55, "0")],
-        )
-        rocket_children.append(
-            f'<g opacity="0">{opacity_anim}'
-            f'<rect x="{gantry_x-half_w}" y="{cy-10}" width="{half_w*2}" height="20" fill="{color}">{translate_anim}</rect>'
-            f'<rect x="{gantry_x-half_w}" y="{cy-10}" width="{half_w*2}" height="20" fill="#ffffff">{flash_anim}</rect>'
+
+    # drifting clouds, slow sideways loop, spread across the wider canvas
+    for i, (cy, scale, dur, delay) in enumerate([
+        (60, 1.0, 34, 0), (110, 0.7, 42, -14), (40, 0.55, 38, -26), (150, 0.8, 46, -6),
+    ]):
+        drift = f'<animateTransform attributeName="transform" type="translate" ' \
+                f'values="-60,0;{w+60},0" dur="{dur}s" begin="{delay}s" repeatCount="indefinite"/>'
+        parts.append(f'<g>{_build_cloud(0, cy, scale)}{drift}</g>')
+
+    # ground: dirt band with a darker seam, grass strip on top
+    parts.append(f'<rect x="0" y="{ground_y}" width="{w}" height="{h-ground_y}" fill="{DIRT_COLOR}"/>')
+    parts.append(f'<rect x="0" y="{ground_y}" width="{w}" height="4" fill="{DIRT_EDGE}"/>')
+    parts.append(f'<rect x="0" y="{ground_y-8}" width="{w}" height="8" fill="{GRASS_COLOR}"/>')
+    parts.append(f'<rect x="0" y="{ground_y-8}" width="{w}" height="3" fill="{GRASS_DARK}"/>')
+
+    # ground texture: a scattering of rocks and grass tufts across the full width
+    for gx in (30, 90, 200, 620, 700, 760):
+        parts.append(_outlined_rect(gx, ground_y + 14, 12, 8, ROCK_COLOR, sw=1.5))
+    for gx in (55, 140, 240, 520, 640, 730):
+        parts.append(
+            f'<g stroke="{GRASS_DARK}" stroke-width="2">'
+            f'<line x1="{gx}" y1="{ground_y-6}" x2="{gx-3}" y2="{ground_y-16}"/>'
+            f'<line x1="{gx+4}" y1="{ground_y-6}" x2="{gx+4}" y2="{ground_y-18}"/>'
+            f'<line x1="{gx+8}" y1="{ground_y-6}" x2="{gx+11}" y2="{ground_y-16}"/>'
             f'</g>'
         )
 
-    # whole assembled rocket translates: rollout (x) then launch (y, exits top of frame)
-    rocket_transform = _stepped_anim(
-        "transform", cycle,
-        [
-            (0.0, "translate(0,0)"),
-            (t_assembly_end, "translate(0,0)"),
-            (t_rollout_end, f"translate({rollout_dx},0)"),
-            (t_launch_end, f"translate({rollout_dx},0)"),
-            (cycle * 0.985, f"translate({rollout_dx},-420)"),
-        ],
-        tag="animateTransform", extra='type="translate"',
-    )
-    parts.append(f'<g>{rocket_transform}{"".join(rocket_children)}</g>')
+    # -- rocket, built from flat blocky sprite pieces, stacked bottom-up --
+    # each *_y is the piece's top edge; heights below must match the shapes
+    # each builder actually draws so pieces sit flush with no gaps/overlaps
+    body_w = 46
+    engine_h, lower_h, upper_h, nose_h, cap_h = 34, 46, 60, 42, 26
+    engine_y = ground_y - engine_h
+    lower_y = engine_y - lower_h
+    upper_y = lower_y - upper_h
+    nose_y = upper_y - nose_h
+    cap_y = nose_y - cap_h
 
-    # fuel gauge: small vertical bar next to the gantry, fills during fueling phase
-    gauge_x, gauge_top, gauge_h, gauge_w = gantry_x + 55, ground_y - 140, 130, 12
-    fill_anim = _stepped_anim(
-        "height", cycle,
-        [(0.0, "0"), (t_assembly_end, "0"), (t_fuel_end, str(gauge_h))],
-    )
-    fill_y_anim = _stepped_anim(
-        "y", cycle,
-        [(0.0, str(gauge_top + gauge_h)), (t_assembly_end, str(gauge_top + gauge_h)), (t_fuel_end, str(gauge_top))],
-    )
-    parts.append(f'<rect x="{gauge_x}" y="{gauge_top}" width="{gauge_w}" height="{gauge_h}" fill="{ROCKET_STRUCT}"/>')
-    parts.append(f'<rect x="{gauge_x}" y="{gauge_top+gauge_h}" width="{gauge_w}" height="0" fill="{ROCKET_FLAME_A}">{fill_anim}{fill_y_anim}</rect>')
+    def piece_engine():
+        y = engine_y
+        return (
+            _outlined_rect(pad_x - body_w/2, y, body_w, 34, ROCKET_DARK)
+            + _outlined_poly(f"{pad_x-body_w/2-10},{y+34} {pad_x-body_w/2+10},{y+34} {pad_x-body_w/2+2},{y+8}", ROCKET_RED)
+            + _outlined_poly(f"{pad_x+body_w/2+10},{y+34} {pad_x+body_w/2-10},{y+34} {pad_x+body_w/2-2},{y+8}", ROCKET_RED)
+        )
 
-    # ignition flash + blocky smoke puffs at the launch pad, right as the rocket lifts off
-    ignite_t = t_rollout_end + (t_launch_end - t_rollout_end) * 0.15
-    flame_anim = _stepped_anim(
+    def piece_lower_body():
+        y = lower_y
+        return _outlined_rect(pad_x - body_w/2, y, body_w, 46, ROCKET_WHITE) + \
+            _outlined_rect(pad_x - body_w/2, y + 16, body_w, 10, ROCKET_BLUE)
+
+    def piece_upper_body():
+        y = upper_y
+        return _outlined_rect(pad_x - body_w/2, y, body_w, 60, ROCKET_WHITE) + \
+            _outlined_rect(pad_x - body_w/2, y + 8, body_w, 8, ROCKET_RED) + \
+            f'<circle cx="{pad_x}" cy="{y+34}" r="12" fill="{SKY_TOP}" stroke="{OUTLINE}" stroke-width="2"/>'
+
+    def piece_nose():
+        y = nose_y
+        # stepped-triangle taper: 3 shrinking bands instead of a smooth curve
+        steps = [(body_w, 16), (body_w*0.62, 14), (body_w*0.3, 12)]
+        segs, sy = [], y + 42
+        for sw_, sh in steps:
+            segs.append(_outlined_rect(pad_x - sw_/2, sy - sh, sw_, sh, ROCKET_RED))
+            sy -= sh
+        return "".join(segs)
+
+    def piece_cap():
+        y = cap_y
+        return _outlined_poly(f"{pad_x-6},{y+26} {pad_x+6},{y+26} {pad_x},{y}", ROCKET_WHITE)
+
+    piece_defs = [
+        ("engine", piece_engine),
+        ("lower body", piece_lower_body),
+        ("upper body", piece_upper_body),
+        ("nose", piece_nose),
+        ("fins", None),  # rendered with the engine block above, counts as a build step
+        ("cap", piece_cap),
+    ]
+
+    rocket_children = []
+    for i, (name, builder) in enumerate(piece_defs):
+        if i >= n_pieces or builder is None:
+            continue
+        appear_t = (i + 1) * (t_assembly_end / (ROCKET_PIECE_CAP + 1))
+        drop_dy = -80
+        translate_anim = _stepped_anim(
+            "transform", cycle,
+            [(0.0, f"translate(0,{drop_dy})"), (appear_t, f"translate(0,{drop_dy})"), (appear_t + 0.35, "translate(0,0)")],
+            tag="animateTransform", extra='type="translate"',
+        )
+        opacity_anim = _stepped_anim("opacity", cycle, [(0.0, "0"), (appear_t, "0"), (appear_t + 0.01, "1")])
+        rocket_children.append(f'<g opacity="0">{opacity_anim}<g>{translate_anim}{builder()}</g></g>')
+
+    # engine flame: attached to the rocket group so it climbs with it, visible
+    # and flickering for the whole ascent (not just the ignition instant)
+    flame_visible_anim = _stepped_anim(
         "opacity", cycle,
-        [(0.0, "0"), (ignite_t, "0"), (ignite_t + 0.05, "1"), (t_launch_end, "1"), (t_launch_end + 0.3, "0")],
+        [(0.0, "0"), (t_ignite, "0"), (t_ignite + 0.05, "1"), (t_launch_end, "1"), (t_launch_end + 0.15, "0")],
     )
-    parts.append(
-        f'<polygon points="{pad_x-14},{ground_y+18} {pad_x+14},{ground_y+18} {pad_x},{ground_y+55}" '
-        f'fill="{ROCKET_FLAME_B}" opacity="0">{flame_anim}</polygon>'
+    flicker_b = '<animate attributeName="opacity" values="1;0.55;0.9;0.7;1" dur="0.3s" repeatCount="indefinite"/>'
+    flicker_a = '<animate attributeName="opacity" values="0.85;1;0.6;1;0.85" dur="0.22s" repeatCount="indefinite"/>'
+    flame_group = (
+        f'<g opacity="0">{flame_visible_anim}'
+        f'<polygon points="{pad_x-14},{ground_y-2} {pad_x+14},{ground_y-2} {pad_x},{ground_y+36}" '
+        f'fill="{FLAME_B}" stroke="{OUTLINE}" stroke-width="2" stroke-linejoin="round">{flicker_b}</polygon>'
+        f'<polygon points="{pad_x-7},{ground_y-2} {pad_x+7},{ground_y-2} {pad_x},{ground_y+20}" '
+        f'fill="{FLAME_A}" stroke="{OUTLINE}" stroke-width="2" stroke-linejoin="round">{flicker_a}</polygon>'
+        f'</g>'
     )
+    rocket_children.append(flame_group)
+
+    # ascent: gentle curved trajectory, slow off the pad then accelerating up
+    # and out of frame - calcMode=spline + keyPoints drives the ease-in feel
+    ascent_dx, ascent_dy = 40, -(h - ground_y + 250)  # clears the canvas with room to spare
+    path_d = f"M0,0 C 30,{ascent_dy*0.35:.0f} {-ascent_dx},{ascent_dy*0.7:.0f} {ascent_dx},{ascent_dy}"
+    t0, t1, t2 = 0.0, round(t_ignite / cycle, 4), round(t_launch_end / cycle, 4)
+    motion_anim = (
+        f'<animateMotion path="{path_d}" keyPoints="0;0;1;1" keyTimes="{t0};{t1};{t2};1" '
+        f'calcMode="spline" keySplines="0 0 1 1;0.42 0 1 1;0 0 1 1" '
+        f'dur="{cycle:.3f}s" repeatCount="indefinite"/>'
+    )
+    # slight clockwise tilt as it climbs, on top of the arc translation
+    tilt_anim = _stepped_anim(
+        "transform", cycle,
+        [(0.0, f"rotate(0 {pad_x:.0f} {ground_y})"), (t_ignite, f"rotate(0 {pad_x:.0f} {ground_y})"),
+         (t_launch_end, f"rotate(14 {pad_x:.0f} {ground_y})")],
+        tag="animateTransform", extra=f'type="rotate" additive="sum"',
+    )
+    parts.append(f'<g>{motion_anim}{tilt_anim}{"".join(rocket_children)}</g>')
+
+    # ground dust/smoke puffs at liftoff (ground-anchored, not attached to the rocket)
     for i in range(4):
-        smoke_dx = (-1) ** i * (10 + i * 14)
-        smoke_appear = ignite_t + i * 0.12
+        smoke_dx = (-1) ** i * (16 + i * 16)
+        smoke_appear = t_ignite + i * 0.15
         smoke_anim = _stepped_anim(
             "opacity", cycle,
-            [(0.0, "0"), (smoke_appear, "0"), (smoke_appear + 0.05, "0.8"), (smoke_appear + 1.0, "0")],
+            [(0.0, "0"), (smoke_appear, "0"), (smoke_appear + 0.05, "0.85"), (smoke_appear + 1.1, "0")],
         )
         parts.append(
-            f'<rect x="{pad_x+smoke_dx-8}" y="{ground_y+10}" width="16" height="16" fill="{ROCKET_SMOKE}" opacity="0">{smoke_anim}</rect>'
+            f'<g opacity="0">{smoke_anim}'
+            + _outlined_rect(pad_x + smoke_dx - 10, ground_y - 4, 20, 20, SMOKE_COLOR, sw=1.5)
+            + '</g>'
         )
 
-    # reset label, visible only during the blank-pad reset beat
-    label_anim = _stepped_anim(
+    # "IT'S DONE" end card, once the rocket has fully cleared the frame
+    end_anim = _stepped_anim(
         "opacity", cycle,
-        [(0.0, "0"), (t_launch_end + 0.4, "0"), (t_launch_end + 0.5, "1"), (cycle * 0.99, "1"), (cycle * 0.995, "0")],
+        [(0.0, "0"), (t_endcard_start, "0"), (t_endcard_start + 0.2, "1"), (t_endcard_end, "1"), (t_endcard_end + 0.3, "0")],
     )
     parts.append(
-        f'<text x="{w/2:.0f}" y="{ground_y-10}" text-anchor="middle" font-family="monospace" font-size="12" '
-        f'letter-spacing="2" fill="{ROCKET_STRUCT_LIGHT}" opacity="0">REBUILDING...{label_anim}</text>'
+        f'<text x="{pad_x:.0f}" y="{ground_y-160}" text-anchor="middle" font-family="Consolas, Menlo, monospace" '
+        f'font-weight="700" font-size="52" letter-spacing="6" fill="{ROCKET_WHITE}" stroke="{OUTLINE}" '
+        f'stroke-width="7" paint-order="stroke" stroke-linejoin="round" opacity="0">IT\'S DONE{end_anim}</text>'
     )
 
     parts.append("</svg>")
