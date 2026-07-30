@@ -121,6 +121,7 @@ now = {
 [![Email](https://img.shields.io/badge/Email-0d1117?style=for-the-badge&logo=gmail&logoColor=58A6FF&labelColor=161b22)](mailto:haragam.22@gmail.com)
 [![GitHub](https://img.shields.io/badge/GitHub-0d1117?style=for-the-badge&logo=github&logoColor=58A6FF&labelColor=161b22)](https://github.com/haragam22)
 [![Kaggle](https://img.shields.io/badge/Kaggle-0d1117?style=for-the-badge&logo=kaggle&logoColor=58A6FF&labelColor=161b22)](https://www.kaggle.com/haragamdeepsingh)
+[![Resume](https://img.shields.io/badge/Resume-0d1117?style=for-the-badge&logo=readdotcv&logoColor=58A6FF&labelColor=161b22)](https://raw.githubusercontent.com/haragam22/haragam22/main/resume.pdf)
 
 </div>
 
