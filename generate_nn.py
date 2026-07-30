@@ -95,6 +95,23 @@ def get_todays_contributions():
     return 0
 
 
+def get_current_streak():
+    days = _fetch_contribution_days()
+    if not days:
+        return 0
+    by_date = {d["date"]: d["contributionCount"] for d in days}
+    streak = 0
+    day = datetime.date.today()
+    # today may not have a contribution yet and shouldn't break a streak that's
+    # still "in progress" - only start counting misses from yesterday backward
+    if by_date.get(day.isoformat(), 0) == 0:
+        day -= datetime.timedelta(days=1)
+    while by_date.get(day.isoformat(), 0) > 0:
+        streak += 1
+        day -= datetime.timedelta(days=1)
+    return streak
+
+
 def get_last_30_days_contributions():
     days = _fetch_contribution_days()
     return days[-30:]
@@ -464,6 +481,190 @@ def _esc(text):
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
+# ---------------------------------------------------------------------------
+# Isometric pixel-art rocket: assembles from streak length, fuels, rolls out,
+# launches, resets, loops. Native SMIL only (no <script>, same GitHub-README
+# constraint as everything else in this file).
+# ---------------------------------------------------------------------------
+
+# streak -> pieces assembled mapping: one piece per streak day, capped at 6
+# (nose, upper body, lower body, fins, engine, plus a top antenna/greeble).
+# streak 0 or 1 day -> bare gantry, no pieces. streak >= 6 -> fully built.
+# tune ROCKET_PIECE_CAP to change how many days it takes to "complete" the rocket.
+ROCKET_PIECE_CAP = 6
+
+ROCKET_BG = "#0d1117"
+ROCKET_STRUCT = "#30363d"
+ROCKET_STRUCT_LIGHT = "#8b949e"
+ROCKET_BODY = "#c9d1d9"
+ROCKET_ACCENT = "#58a6ff"
+ROCKET_FLAME_A = "#ffd23f"
+ROCKET_FLAME_B = "#ff6b35"
+ROCKET_SMOKE = "#484f58"
+
+
+def pieces_for_streak(streak):
+    return max(0, min(streak, ROCKET_PIECE_CAP))
+
+
+def _stepped_anim(attr, cycle, breakpoints, tag="animate", extra=""):
+    """breakpoints: sorted [(t_seconds, value_str), ...]. Holds each value from
+    its breakpoint until the next one, wraps at the cycle boundary - same
+    step-animation technique used elsewhere in this file (see build_svg)."""
+    key_times = sorted({0.0, *(round(t / cycle, 4) for t, _ in breakpoints), 1.0})
+    shape = {round(t / cycle, 4): v for t, v in breakpoints}
+    values, last = [], breakpoints[0][1]
+    for kt in key_times:
+        if kt in shape:
+            last = shape[kt]
+        values.append(last)
+    vs = ";".join(values)
+    kts = ";".join(str(k) for k in key_times)
+    return (
+        f'<{tag} attributeName="{attr}" values="{vs}" keyTimes="{kts}" '
+        f'dur="{cycle:.3f}s" repeatCount="indefinite" {extra}/>'
+    )
+
+
+def build_rocket(streak):
+    n_pieces = pieces_for_streak(streak)
+
+    w, h = 420, 320
+    cycle = 14.0
+    t_assembly_end = cycle * 0.40
+    t_fuel_end = cycle * 0.55
+    t_rollout_end = cycle * 0.70
+    t_launch_end = cycle * 0.90
+    # reset phase fills the remainder of the cycle back to 1.0
+
+    gantry_x, ground_y = 110, 260
+    pad_x = 300  # where the crawler delivers the rocket for launch
+    rollout_dx = pad_x - gantry_x
+
+    parts = [
+        f'<svg width="100%" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg" '
+        f'shape-rendering="crispEdges">',
+        f'<rect width="{w}" height="{h}" fill="{ROCKET_BG}"/>',
+        f'<rect x="0" y="{ground_y+18}" width="{w}" height="{h-ground_y-18}" fill="#161b22"/>',
+    ]
+
+    # static gantry truss (assembly pad, left side)
+    parts.append(f'<g stroke="{ROCKET_STRUCT_LIGHT}" stroke-width="3" fill="none">')
+    parts.append(f'<line x1="{gantry_x-34}" y1="{ground_y+18}" x2="{gantry_x-34}" y2="{ground_y-160}"/>')
+    parts.append(f'<line x1="{gantry_x+34}" y1="{ground_y+18}" x2="{gantry_x+34}" y2="{ground_y-160}"/>')
+    for gy in range(ground_y - 150, ground_y + 10, 30):
+        parts.append(f'<line x1="{gantry_x-34}" y1="{gy}" x2="{gantry_x+34}" y2="{gy}"/>')
+    parts.append("</g>")
+
+    # launch pad marker (right side, blocky iso platform)
+    parts.append(
+        f'<polygon points="{pad_x-40},{ground_y+18} {pad_x+40},{ground_y+18} {pad_x+30},{ground_y+38} {pad_x-30},{ground_y+38}" '
+        f'fill="{ROCKET_STRUCT}"/>'
+    )
+
+    # rocket pieces, stacked bottom-up: engine, lower body, fins, upper body, nose, antenna
+    piece_h = 30
+    piece_defs = [
+        ("engine", ground_y, 20, ROCKET_STRUCT),
+        ("lower body", ground_y - piece_h, 18, ROCKET_BODY),
+        ("fins", ground_y - piece_h * 2, 26, ROCKET_ACCENT),
+        ("upper body", ground_y - piece_h * 2 - 20, 18, ROCKET_BODY),
+        ("nose", ground_y - piece_h * 3 - 20, 22, ROCKET_ACCENT),
+        ("antenna", ground_y - piece_h * 3 - 42, 8, ROCKET_STRUCT_LIGHT),
+    ]
+
+    rocket_children = []
+    for i, (name, y, half_w, color) in enumerate(piece_defs):
+        visible = i < n_pieces
+        appear_t = (i + 1) * (t_assembly_end / (ROCKET_PIECE_CAP + 1))
+        cy = y - 12
+        if not visible:
+            continue
+        drop_from = cy - 60
+        # piece drops into place then flashes white briefly on landing ("thunk")
+        translate_anim = _stepped_anim(
+            "transform", cycle,
+            [(0.0, f"translate(0,{drop_from-cy})"), (appear_t, f"translate(0,{drop_from-cy})"),
+             (appear_t + 0.35, "translate(0,0)")],
+            tag="animateTransform", extra='type="translate" additive="sum"',
+        )
+        opacity_anim = _stepped_anim(
+            "opacity", cycle,
+            [(0.0, "0"), (appear_t, "0"), (appear_t + 0.01, "1")],
+        )
+        flash_anim = _stepped_anim(
+            "opacity", cycle,
+            [(0.0, "0"), (appear_t + 0.35, "0"), (appear_t + 0.36, "0.9"), (appear_t + 0.55, "0")],
+        )
+        rocket_children.append(
+            f'<g opacity="0">{opacity_anim}'
+            f'<rect x="{gantry_x-half_w}" y="{cy-10}" width="{half_w*2}" height="20" fill="{color}">{translate_anim}</rect>'
+            f'<rect x="{gantry_x-half_w}" y="{cy-10}" width="{half_w*2}" height="20" fill="#ffffff">{flash_anim}</rect>'
+            f'</g>'
+        )
+
+    # whole assembled rocket translates: rollout (x) then launch (y, exits top of frame)
+    rocket_transform = _stepped_anim(
+        "transform", cycle,
+        [
+            (0.0, "translate(0,0)"),
+            (t_assembly_end, "translate(0,0)"),
+            (t_rollout_end, f"translate({rollout_dx},0)"),
+            (t_launch_end, f"translate({rollout_dx},0)"),
+            (cycle * 0.985, f"translate({rollout_dx},-420)"),
+        ],
+        tag="animateTransform", extra='type="translate"',
+    )
+    parts.append(f'<g>{rocket_transform}{"".join(rocket_children)}</g>')
+
+    # fuel gauge: small vertical bar next to the gantry, fills during fueling phase
+    gauge_x, gauge_top, gauge_h, gauge_w = gantry_x + 55, ground_y - 140, 130, 12
+    fill_anim = _stepped_anim(
+        "height", cycle,
+        [(0.0, "0"), (t_assembly_end, "0"), (t_fuel_end, str(gauge_h))],
+    )
+    fill_y_anim = _stepped_anim(
+        "y", cycle,
+        [(0.0, str(gauge_top + gauge_h)), (t_assembly_end, str(gauge_top + gauge_h)), (t_fuel_end, str(gauge_top))],
+    )
+    parts.append(f'<rect x="{gauge_x}" y="{gauge_top}" width="{gauge_w}" height="{gauge_h}" fill="{ROCKET_STRUCT}"/>')
+    parts.append(f'<rect x="{gauge_x}" y="{gauge_top+gauge_h}" width="{gauge_w}" height="0" fill="{ROCKET_FLAME_A}">{fill_anim}{fill_y_anim}</rect>')
+
+    # ignition flash + blocky smoke puffs at the launch pad, right as the rocket lifts off
+    ignite_t = t_rollout_end + (t_launch_end - t_rollout_end) * 0.15
+    flame_anim = _stepped_anim(
+        "opacity", cycle,
+        [(0.0, "0"), (ignite_t, "0"), (ignite_t + 0.05, "1"), (t_launch_end, "1"), (t_launch_end + 0.3, "0")],
+    )
+    parts.append(
+        f'<polygon points="{pad_x-14},{ground_y+18} {pad_x+14},{ground_y+18} {pad_x},{ground_y+55}" '
+        f'fill="{ROCKET_FLAME_B}" opacity="0">{flame_anim}</polygon>'
+    )
+    for i in range(4):
+        smoke_dx = (-1) ** i * (10 + i * 14)
+        smoke_appear = ignite_t + i * 0.12
+        smoke_anim = _stepped_anim(
+            "opacity", cycle,
+            [(0.0, "0"), (smoke_appear, "0"), (smoke_appear + 0.05, "0.8"), (smoke_appear + 1.0, "0")],
+        )
+        parts.append(
+            f'<rect x="{pad_x+smoke_dx-8}" y="{ground_y+10}" width="16" height="16" fill="{ROCKET_SMOKE}" opacity="0">{smoke_anim}</rect>'
+        )
+
+    # reset label, visible only during the blank-pad reset beat
+    label_anim = _stepped_anim(
+        "opacity", cycle,
+        [(0.0, "0"), (t_launch_end + 0.4, "0"), (t_launch_end + 0.5, "1"), (cycle * 0.99, "1"), (cycle * 0.995, "0")],
+    )
+    parts.append(
+        f'<text x="{w/2:.0f}" y="{ground_y-10}" text-anchor="middle" font-family="monospace" font-size="12" '
+        f'letter-spacing="2" fill="{ROCKET_STRUCT_LIGHT}" opacity="0">REBUILDING...{label_anim}</text>'
+    )
+
+    parts.append("</svg>")
+    return "\n".join(parts)
+
+
 def main():
     commits_today = get_todays_contributions()
     sizes = layer_sizes(commits_today)
@@ -475,17 +676,22 @@ def main():
     repos = _fetch_user_repos()
     core_svg = build_core_telemetry(repos)
 
+    streak = get_current_streak()
+    rocket_svg = build_rocket(streak)
+
     os.makedirs("dist", exist_ok=True)
     outputs = {
         "dist/neural-network.svg": nn_svg,
         "dist/contribution-telemetry.svg": chart_svg,
         "dist/core-telemetry.svg": core_svg,
+        "dist/rocket.svg": rocket_svg,
     }
     for path, svg in outputs.items():
         with open(path, "w", encoding="utf-8") as f:
             f.write(svg)
     print(f"today's contributions: {commits_today} -> layer sizes {sizes}")
     print(f"30-day chart points: {len(last_30)}, repos: {len(repos)}")
+    print(f"current streak: {streak} -> rocket pieces {pieces_for_streak(streak)}/{ROCKET_PIECE_CAP}")
 
 
 if __name__ == "__main__":

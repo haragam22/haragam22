@@ -107,6 +107,12 @@ now = {
 
 ---
 
+<div align="center">
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/rocket.svg" width="420" alt="pixel-art rocket assembling from current GitHub streak, fueling, rolling out, and launching on loop" />
+</div>
+
+---
+
 ### `> contact.init()`
 
 <div align="center">
