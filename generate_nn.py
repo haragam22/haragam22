@@ -566,7 +566,7 @@ def build_rocket(streak):
     t_assembly_end = cycle * 0.35
     t_ignite = t_assembly_end + 0.3
     t_launch_end = cycle * 0.72       # rocket fully clear of the canvas by here
-    t_endcard_start = t_launch_end + 0.3
+    t_endcard_start = t_launch_end + 0.5
     t_endcard_end = cycle * 0.93
     # reset phase fills the remainder of the cycle back to 1.0
 
@@ -709,7 +709,8 @@ def build_rocket(streak):
 
     # ascent: gentle curved trajectory, slow off the pad then accelerating up
     # and out of frame - calcMode=spline + keyPoints drives the ease-in feel
-    ascent_dx, ascent_dy = 40, -(h - ground_y + 250)  # clears the canvas with room to spare
+    rocket_total_h = engine_h + lower_h + upper_h + nose_h + cap_h
+    ascent_dx, ascent_dy = 40, -(h + rocket_total_h + 120)  # guarantees it's fully clear of the canvas, not just past center
     path_d = f"M0,0 C 30,{ascent_dy*0.35:.0f} {-ascent_dx},{ascent_dy*0.7:.0f} {ascent_dx},{ascent_dy}"
     t0, t1, t2 = 0.0, round(t_ignite / cycle, 4), round(t_launch_end / cycle, 4)
     motion_anim = (
