@@ -460,133 +460,8 @@ def build_core_telemetry(repos):
     return "\n".join(parts)
 
 
-# ---------------------------------------------------------------------------
-# Terminal mockup: animated git-log window
-# ---------------------------------------------------------------------------
-
-def _fetch_recent_commits(repos, limit=5):
-    if not TOKEN or not USERNAME or not repos:
-        return []
-    ranked = sorted(repos, key=lambda r: r.get("pushed_at") or "", reverse=True)[:8]
-    commits = []
-    for repo in ranked:
-        try:
-            resp = requests.get(
-                f"https://api.github.com/repos/{USERNAME}/{repo['name']}/commits",
-                params={"per_page": 3},
-                headers={"Authorization": f"token {TOKEN}"},
-                timeout=30,
-            )
-            resp.raise_for_status()
-            for c in resp.json():
-                msg = c["commit"]["message"].splitlines()[0][:52]
-                commits.append({"sha": c["sha"][:7], "repo": repo["name"], "msg": msg})
-        except Exception as exc:
-            print(f"warning: commit lookup failed for {repo.get('name')} ({exc})")
-        if len(commits) >= limit:
-            break
-    return commits[:limit]
-
-
 def _esc(text):
     return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-
-
-def build_terminal(commits):
-    w, h = 760, 300
-    char_w, line_h = 7.2, 20
-    font = "SF Mono, Menlo, Consolas, monospace"
-    chrome_h = 32
-    pad_x, pad_y = 16, 20
-
-    if not commits:
-        commits = [{"sha": "0000000", "repo": "n/a", "msg": "no recent commits found"}]
-
-    lines = []
-    for c in commits:
-        prefix = f"* {c['sha']} "
-        bracket = f"[{c['repo']}] "
-        lines.append((prefix, bracket, c["msg"]))
-
-    prompt = f"{USERNAME or 'user'}@system ~/workspace $ git log --oneline --graph -n {len(commits)}"
-
-    type_speed = 0.02      # seconds per character
-    line_gap = 0.35        # pause between lines
-    cursor_period = 0.53
-    cycle = 18.0           # full retype loop period
-
-    parts = [
-        f'<svg width="100%" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg">',
-        '<defs>',
-        f'<filter id="term-shadow" x="-20%" y="-20%" width="140%" height="140%">'
-        f'<feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#000000" flood-opacity="0.5"/></filter>',
-        '</defs>',
-        f'<rect width="{w}" height="{h}" fill="none"/>',
-        f'<rect x="4" y="4" width="{w-8}" height="{h-8}" rx="10" fill="#1e1e1e" filter="url(#term-shadow)"/>',
-        f'<rect x="4" y="4" width="{w-8}" height="{chrome_h}" rx="10" fill="#2b2b2b"/>',
-        f'<rect x="4" y="{4+chrome_h-10}" width="{w-8}" height="10" fill="#2b2b2b"/>',
-        '<circle cx="26" cy="20" r="6" fill="#ff5f56"/>',
-        '<circle cx="46" cy="20" r="6" fill="#ffbd2e"/>',
-        '<circle cx="66" cy="20" r="6" fill="#27c93f"/>',
-        f'<text x="{w/2:.0f}" y="24" font-family="{font}" font-size="12" fill="#9a9a9a" text-anchor="middle">'
-        f'{_esc(USERNAME or "user")}@system: ~/workspace</text>',
-    ]
-
-    ty = chrome_h + pad_y + 10
-    parts.append(
-        f'<text x="{pad_x}" y="{ty:.1f}" font-family="{font}" font-size="13" fill="#7ee787">$ '
-        f'<tspan fill="#e6edf3">{_esc(prompt.split("$ ",1)[1])}</tspan></text>'
-    )
-
-    t_cursor_start = 0.0
-    row_start_time = line_gap  # after prompt line
-    reveal_defs = []
-    max_chars_row = 0
-
-    for row_i, (prefix, bracket, msg) in enumerate(lines):
-        full = prefix + bracket + msg
-        max_chars_row = max(max_chars_row, len(full))
-        row_y = ty + line_h * (row_i + 1)
-        row_type_dur = len(full) * type_speed
-        row_end = row_start_time + row_type_dur
-
-        # clip-path reveal: rect grows left->right over the row's type duration
-        clip_id = f"clip{row_i}"
-        full_w = len(full) * char_w + 4
-        parts.append(
-            f'<clipPath id="{clip_id}"><rect x="{pad_x-2:.1f}" y="{row_y-14:.1f}" height="18" width="0">'
-            f'<animate attributeName="width" from="0" to="{full_w:.1f}" begin="{row_start_time:.2f}s" '
-            f'dur="{row_type_dur:.2f}s" fill="freeze"/>'
-            f'<animate attributeName="width" values="0;0" begin="{row_start_time+cycle:.2f}s" dur="0.01s" fill="freeze"/>'
-            f'</rect></clipPath>'
-        )
-        colored = (
-            f'<tspan fill="#ffa657">{_esc(prefix)}</tspan>'
-            f'<tspan fill="#7ee787">{_esc(bracket)}</tspan>'
-            f'<tspan fill="#e6edf3">{_esc(msg)}</tspan>'
-        )
-        parts.append(
-            f'<text clip-path="url(#{clip_id})" x="{pad_x}" y="{row_y:.1f}" font-family="{font}" font-size="13">{colored}</text>'
-        )
-        row_start_time = row_end + line_gap
-
-    last_row_y = ty + line_h * len(lines)
-    last_row_end = row_start_time - line_gap
-    cursor_x = pad_x + max_chars_row * char_w + 6
-
-    # blink indefinitely once typing settles, then everything resets via the outer cycle
-    parts.append(
-        f'<rect x="{cursor_x:.1f}" y="{last_row_y-12:.1f}" width="7" height="14" fill="#e6edf3" opacity="0">'
-        f'<animate attributeName="opacity" values="0;0;1;1;0" '
-        f'keyTimes="0;{min(last_row_end/cycle,0.999):.4f};{min(last_row_end/cycle,0.999):.4f};1;1" '
-        f'begin="0s" dur="{cycle:.2f}s" repeatCount="indefinite"/>'
-        f'<animate attributeName="opacity" values="1;0;1" dur="{cursor_period:.2f}s" '
-        f'begin="{last_row_end:.2f}s" repeatCount="indefinite"/>'
-        f'</rect>'
-    )
-
-    parts.append("</svg>")
-    return "\n".join(parts)
 
 
 def main():
@@ -600,21 +475,17 @@ def main():
     repos = _fetch_user_repos()
     core_svg = build_core_telemetry(repos)
 
-    recent_commits = _fetch_recent_commits(repos)
-    terminal_svg = build_terminal(recent_commits)
-
     os.makedirs("dist", exist_ok=True)
     outputs = {
         "dist/neural-network.svg": nn_svg,
         "dist/contribution-telemetry.svg": chart_svg,
         "dist/core-telemetry.svg": core_svg,
-        "dist/terminal.svg": terminal_svg,
     }
     for path, svg in outputs.items():
         with open(path, "w", encoding="utf-8") as f:
             f.write(svg)
     print(f"today's contributions: {commits_today} -> layer sizes {sizes}")
-    print(f"30-day chart points: {len(last_30)}, repos: {len(repos)}, recent commits: {len(recent_commits)}")
+    print(f"30-day chart points: {len(last_30)}, repos: {len(repos)}")
 
 
 if __name__ == "__main__":

@@ -22,14 +22,9 @@
 
 <div align="center">
 
-<img src="https://streak-stats.demolab.com?user=haragam22&theme=dark&background=0D1117&stroke=58A6FF&ring=58A6FF&fire=58A6FF&currStreakLabel=58A6FF" alt="GitHub Streak" />
-<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=haragam22&layout=compact&theme=dark&bg_color=0D1117&title_color=58A6FF&text_color=e6edf3&hide_border=true" alt="Top Languages" />
-
 <img src="https://raw.githubusercontent.com/haragam22/haragam22/output/contribution-telemetry.svg" width="100%" alt="30-day contribution telemetry chart" />
 
 <img src="https://raw.githubusercontent.com/haragam22/haragam22/output/core-telemetry.svg" width="100%" alt="GitHub core telemetry panel" />
-
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/terminal.svg" width="100%" alt="live terminal mockup of recent commits" />
 
 </div>
 
@@ -51,17 +46,17 @@ har_agam = {
 
 ### `> stack`
 
-**Core**
+<b style="display: inline-block; vertical-align: middle;">Core</b>
 <img src="https://skillicons.dev/icons?i=python,cpp" style="margin: 0 9px; vertical-align: middle;" />
 
-**AI / ML**
+<b style="display: inline-block; vertical-align: middle;">AI / ML</b>
 <img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" style="margin: 0 9px; vertical-align: middle;" />
 <img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" style="margin: 0 9px; vertical-align: middle;" />
 
-**Backend & infra**
+<b style="display: inline-block; vertical-align: middle;">Backend & infra</b>
 <img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" style="margin: 0 9px; vertical-align: middle;" />
 
-**Tools**
+<b style="display: inline-block; vertical-align: middle;">Tools</b>
 <img src="https://skillicons.dev/icons?i=git,github,githubactions" style="margin: 0 9px; vertical-align: middle;" />
 
 ---
