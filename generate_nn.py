@@ -566,7 +566,7 @@ def build_rocket(streak):
     t_assembly_end = cycle * 0.35
     t_ignite = t_assembly_end + 0.3
     t_launch_end = cycle * 0.72       # rocket fully clear of the canvas by here
-    t_endcard_start = t_launch_end + 0.5
+    t_endcard_start = t_launch_end + 0.25
     t_endcard_end = cycle * 0.93
     # reset phase fills the remainder of the cycle back to 1.0
 
