@@ -18,18 +18,6 @@
 
 ---
 
-### `> telemetry`
-
-<div align="center">
-
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/contribution-telemetry.svg" width="100%" alt="30-day contribution telemetry chart" />
-
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/core-telemetry.svg" width="100%" alt="GitHub core telemetry panel" />
-
-</div>
-
----
-
 ### `> whoami`
 
 ```python
@@ -44,20 +32,40 @@ har_agam = {
 
 ---
 
+### `> telemetry`
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/contribution-telemetry.svg" width="100%" alt="30-day contribution telemetry chart" />
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/core-telemetry.svg" width="100%" alt="GitHub core telemetry panel" />
+
+</div>
+
+---
+
 ### `> stack`
 
-<b style="display: inline-block; vertical-align: middle;">Core</b>
-<img src="https://skillicons.dev/icons?i=python,cpp" style="margin: 0 9px; vertical-align: middle;" />
+<div style="display: flex; align-items: center; gap: 9px;">
+<b>Core</b>
+<img src="https://skillicons.dev/icons?i=python,cpp" style="margin: 0 9px;" />
+</div>
 
-<b style="display: inline-block; vertical-align: middle;">AI / ML</b>
-<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" style="margin: 0 9px; vertical-align: middle;" />
-<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" style="margin: 0 9px; vertical-align: middle;" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" style="margin: 0 9px; vertical-align: middle;" />
+<div style="display: flex; align-items: center; gap: 9px;">
+<b>AI / ML</b>
+<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" style="margin: 0 9px;" />
+<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" style="margin: 0 9px;" />
+</div>
 
-<b style="display: inline-block; vertical-align: middle;">Backend & infra</b>
-<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" style="margin: 0 9px; vertical-align: middle;" />
+<div style="display: flex; align-items: center; gap: 9px;">
+<b>Backend & infra</b>
+<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" style="margin: 0 9px;" />
+</div>
 
-<b style="display: inline-block; vertical-align: middle;">Tools</b>
-<img src="https://skillicons.dev/icons?i=git,github,githubactions" style="margin: 0 9px; vertical-align: middle;" />
+<div style="display: flex; align-items: center; gap: 9px;">
+<b>Tools</b>
+<img src="https://skillicons.dev/icons?i=git,github,githubactions" style="margin: 0 9px;" />
+</div>
 
 ---
 
