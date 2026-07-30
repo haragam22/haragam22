@@ -18,6 +18,23 @@
 
 ---
 
+### `> telemetry`
+
+<div align="center">
+
+<img src="https://streak-stats.demolab.com?user=haragam22&theme=dark&background=0D1117&stroke=58A6FF&ring=58A6FF&fire=58A6FF&currStreakLabel=58A6FF" alt="GitHub Streak" />
+<img src="https://github-readme-stats.vercel.app/api/top-langs/?username=haragam22&layout=compact&theme=dark&bg_color=0D1117&title_color=58A6FF&text_color=e6edf3&hide_border=true" alt="Top Languages" />
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/contribution-telemetry.svg" width="100%" alt="30-day contribution telemetry chart" />
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/core-telemetry.svg" width="100%" alt="GitHub core telemetry panel" />
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/terminal.svg" width="100%" alt="live terminal mockup of recent commits" />
+
+</div>
+
+---
+
 ### `> whoami`
 
 ```python
@@ -34,18 +51,22 @@ har_agam = {
 
 ### `> stack`
 
-**Core**
-<img src="https://skillicons.dev/icons?i=python,cpp" />
+<div align="center">
 
-**AI / ML**
-<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" />
-<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" />
+<h4>Core</h4>
+<img src="https://skillicons.dev/icons?i=python,cpp" style="margin: 0 9px;" />
 
-**Backend & infra**
-<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" />
+<h4>AI / ML</h4>
+<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" style="margin: 0 9px;" />
+<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" style="margin: 0 9px;" />
 
-**Tools**
-<img src="https://skillicons.dev/icons?i=git,github,githubactions" />
+<h4>Backend & infra</h4>
+<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" style="margin: 0 9px;" />
+
+<h4>Tools</h4>
+<img src="https://skillicons.dev/icons?i=git,github,githubactions" style="margin: 0 9px;" />
+
+</div>
 
 ---
 
