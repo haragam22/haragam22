@@ -64,13 +64,16 @@ now = {
 
 <div align="center">
 
-<img src="dist/pinned-projects.svg" width="100%" alt="five pinned project cards — Devlens, Jal Drishti, DebateMind, ClauseCraft AI, DropDrive — each with role, description, and tech tags" />
+<img src="dist/pinned-projects.svg" width="100%" alt="six pinned project cards — debatemind, devlens, jal-drishti, sonic_script, DATATHON-2026, galla-sathi — each with role, description, and tech tags" />
 
-[![Devlens](https://img.shields.io/badge/Devlens-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/devlens)
-[![Jal Drishti](https://img.shields.io/badge/Jal%20Drishti-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/jal-drishti)
-[![DebateMind](https://img.shields.io/badge/DebateMind-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/debatemind)
-[![ClauseCraft AI](https://img.shields.io/badge/ClauseCraft%20AI-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/clausecraft-ai)
-[![DropDrive](https://img.shields.io/badge/DropDrive-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/dropdrive)
+[![debatemind](https://img.shields.io/badge/debatemind-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/debatemind)
+[![devlens](https://img.shields.io/badge/devlens-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/devlens)
+[![jal-drishti](https://img.shields.io/badge/jal--drishti-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/jal-drishti)
+[![sonic_script](https://img.shields.io/badge/sonic__script-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/sonic_script)
+[![DATATHON-2026](https://img.shields.io/badge/DATATHON--2026-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/DATATHON-2026)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://datathon-2026-60076596887.development.catalystserverless.in/app)
+[![galla-sathi](https://img.shields.io/badge/galla--sathi-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/galla-sathi)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://galla-sathi.vercel.app/)
 
 </div>
 

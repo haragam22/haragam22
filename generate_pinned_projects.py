@@ -25,27 +25,36 @@ PAD = 18
 MARGIN = 16
 
 PROJECTS = [
-    ("Devlens", "backend lead",
+    ("debatemind", "backend & ML",
+     "Autonomous AI debate framework, RL-optimized LLM reasoning backed "
+     "by a real-time RAG pipeline for fact-checking",
+     ["RL", "RAG", "LLMs"]),
+    ("devlens", "backend lead",
      "AI codebase navigator: deterministic AST parsing + hybrid vector "
      "search mapping 500+ dependencies/issues; agentic backend explains "
      "architectural intent, cut onboarding time ~60%",
      ["Python", "AST", "vector search", "LLMs"]),
-    ("Jal Drishti", "ML lead",
+    ("jal-drishti", "ML lead",
      "Real-time underwater CV surveillance, YOLOv8 + FUnIE-GAN, 89%+ mAP "
      "across 5 threat classes; dual-mode backend with <80ms WebSocket telemetry",
      ["YOLOv8", "FUnIE-GAN", "WebSockets"]),
-    ("DebateMind", "backend & ML",
-     "Autonomous AI debate framework, RL-optimized LLM reasoning backed "
-     "by a real-time RAG pipeline for fact-checking",
-     ["RL", "RAG", "LLMs"]),
-    ("ClauseCraft AI", "project lead",
-     "Multi-agent policy navigator (RAG + deterministic NLP validation), "
-     "cut manual eligibility-check time ~70% across 10+ simultaneous docs",
-     ["RAG", "multi-agent", "NLP"]),
-    ("DropDrive", "backend research",
-     "MERN + C++ secure data-wiping tool, NIST SP 800-88 compliant; "
-     "shortlisted, Smart India Hackathon",
-     ["MERN", "C++"]),
+    ("sonic_script", "creator",
+     'The White-Box Composer — a generative DSP engine where AI writes '
+     "editable Python code to synthesize music instead of static audio "
+     'files; self-correcting sandboxed codegen, validated by a CLAP-based '
+     '"vibe check" against user intent',
+     ["Python", "DSP", "Agentic AI", "Sandboxing"]),
+    ("DATATHON-2026", "backend & architecture",
+     "Catalyst by Zoho Datathon 2026 — conversational AI for the Karnataka "
+     "State Police crime database, two-stage intent-verification "
+     "architecture built to stay grounded and hallucination-resistant",
+     ["Python", "LLM", "NLP", "Catalyst QuickML"]),
+    ("galla-sathi", "backend & ML lead",
+     "Vyapar-Vaani — voice-first AI copilot for kirana shopkeepers, built "
+     "on a fine-tuned Gemma 4 model for a Kaggle Gemma hackathon (Track 1 "
+     "— Vaani); manages ledger, inventory, and collections by voice across "
+     "Hindi, Punjabi, and code-switched English",
+     ["TypeScript", "Gemma", "Voice AI", "FastAPI"]),
 ]
 
 
@@ -73,7 +82,7 @@ def build_card(x, y, index, name, role, desc, tags):
         f'fill="{ROLE_COLOR}">{_esc(role)}</text>',
     ]
 
-    desc_lines = _wrap(desc, 46, 3)
+    desc_lines = _wrap(desc, 46, 4)
     dy = y + 78
     for line in desc_lines:
         parts.append(
