@@ -1,8 +1,20 @@
-<div align="center">
+<div>
 
-# Hey, I'm Har Agam Deep Singh 👋
+<sub>PORTFOLIO — INDEX № 001</sub>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<sub>INDIA</sub>
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=JetBrains+Mono&weight=600&size=20&pause=1000&color=58A6FF&center=true&vCenter=true&width=700&lines=B.Tech+CSE+%40+MAIT%2C+GGSIPU;Machine+Learning+%2B+Generative+AI+%2B+Backend;Multi-agent+RAG+%7C+Adversarial+ML+%7C+Mech+Interp;Currently%3A+chasing+an+AI%2FML+internship)](https://git.io/typing-svg)
+---
+
+# Har Agam Deep Singh
+
+Machine Learning & Generative AI Developer.
+
+focus ›  **machine learning · generative ai · multi-agent systems · backend**
+
+open to internships · research collaboration
+
+---
+
+<sub>MACHINE LEARNING · GENERATIVE AI · BACKEND</sub>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<sub>MAIT — 2028</sub>
 
 </div>
 
