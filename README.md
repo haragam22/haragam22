@@ -70,10 +70,10 @@ now = {
 [![devlens](https://img.shields.io/badge/devlens-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/devlens)
 [![jal-drishti](https://img.shields.io/badge/jal--drishti-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/jal-drishti)
 [![sonic_script](https://img.shields.io/badge/sonic__script-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/sonic_script)
-[![DATATHON-2026](https://img.shields.io/badge/DATATHON--2026-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/DATATHON-2026)
-[![deployed](https://img.shields.io/badge/deployed-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://datathon-2026-60076596887.development.catalystserverless.in/app)
-[![galla-sathi](https://img.shields.io/badge/galla--sathi-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/galla-sathi)
-[![deployed](https://img.shields.io/badge/deployed-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://galla-sathi.vercel.app/)
+[![DATATHON-2026](https://img.shields.io/badge/DATATHON--2026-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://datathon-2026-60076596887.development.catalystserverless.in/app)
+
+[![galla-sathi](https://img.shields.io/badge/galla--sathi-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://galla-sathi.vercel.app/)
+
 
 </div>
 
