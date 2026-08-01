@@ -4,7 +4,14 @@ uniform monochrome accent, single source (simple-icons via cdn.simpleicons.org)
 for every icon so nothing looks mismatched. Static content, one-time render
 like generate_header.py / generate_pinned_projects.py - not part of the
 daily Action.
+
+Icons are fetched once and inlined as base64 data URIs. An SVG loaded via
+<img> renders in a sandboxed "image context" that browsers block from
+fetching further external resources, so a live https:// href inside a
+generated SVG silently fails to render once it's embedded in the README.
 """
+import base64
+import requests
 
 W = 760
 BG = "#0d1117"
@@ -24,16 +31,26 @@ CATEGORIES = [
     ("Core", ["python", "cplusplus"]),
     ("AI / ML", ["pytorch", "tensorflow", "scikitlearn", "opencv", "huggingface",
                  "kaggle", "keras", "numpy", "pandas"]),
-    ("Backend & infra", ["fastapi", "django", "docker", "amazonaws", "googlecloud",
+    ("Backend & infra", ["fastapi", "django", "docker", "aws", "googlecloud",
                           "postgresql", "mongodb", "redis"]),
     ("Tools", ["git", "github", "githubactions"]),
 ]
 
 
-def _row_height(n_icons, avail_w):
-    per_row = max(1, (avail_w + GAP) // (TILE + GAP))
-    rows = -(-n_icons // per_row)
-    return ROW_LABEL_H + rows * TILE + (rows - 1) * GAP
+# simple-icons has no Amazon/AWS logo (trademark removal) - only exception
+# routed through skillicons.dev instead, everything else stays one source
+_SKILLICONS_FALLBACK = {"aws"}
+
+
+def _fetch_icon_data_uri(slug):
+    if slug in _SKILLICONS_FALLBACK:
+        url = f"https://skillicons.dev/icons?i={slug}"
+    else:
+        url = f"https://cdn.simpleicons.org/{slug}/{ACCENT}"
+    resp = requests.get(url, timeout=15)
+    resp.raise_for_status()
+    b64 = base64.b64encode(resp.content).decode("ascii")
+    return f"data:image/svg+xml;base64,{b64}"
 
 
 def build_svg():
@@ -59,9 +76,10 @@ def build_svg():
                 f'fill="{TILE_FILL}" stroke="{TILE_STROKE}" stroke-width="1.5"/>'
             )
             icon_xy = (TILE - ICON) / 2
+            data_uri = _fetch_icon_data_uri(slug)
             parts.append(
                 f'<image x="{tx+icon_xy:.1f}" y="{ty+icon_xy:.1f}" width="{ICON}" height="{ICON}" '
-                f'href="https://cdn.simpleicons.org/{slug}/{ACCENT}"/>'
+                f'href="{data_uri}"/>'
             )
         rows = -(-len(icons) // per_row)
         y += rows * TILE + (rows - 1) * GAP + ROW_GAP
