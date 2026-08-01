@@ -53,6 +53,10 @@ def _fetch_icon_data_uri(slug):
     return f"data:image/svg+xml;base64,{b64}"
 
 
+def _esc(text):
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def build_svg():
     avail_w = W - 2 * MARGIN
     height = 20
@@ -62,7 +66,7 @@ def build_svg():
     for label, icons in CATEGORIES:
         parts.append(
             f'<text x="{MARGIN}" y="{y}" font-family="monospace" font-size="12" '
-            f'font-weight="700" letter-spacing="1" fill="{LABEL_COLOR}">{label.upper()}</text>'
+            f'font-weight="700" letter-spacing="1" fill="{LABEL_COLOR}">{_esc(label.upper())}</text>'
         )
         y += ROW_LABEL_H
 
