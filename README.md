@@ -1,20 +1,6 @@
-<div>
+<div align="center">
 
-<sub>PORTFOLIO — INDEX № 001</sub>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<sub>INDIA</sub>
-
----
-
-# Har Agam Deep Singh
-
-Machine Learning & Generative AI Developer.
-
-focus ›  **machine learning · generative ai · multi-agent systems · backend**
-
-open to internships · research collaboration
-
----
-
-<sub>MACHINE LEARNING · GENERATIVE AI · BACKEND</sub>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;<sub>MAIT — 2028</sub>
+<img src="dist/header.svg" width="100%" alt="Har Agam Deep Singh — Machine Learning &amp; Generative AI Developer" />
 
 </div>
 
