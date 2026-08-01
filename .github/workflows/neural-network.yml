@@ -36,3 +36,5 @@ jobs:
           publish_dir: ./dist
           publish_branch: output
           force_orphan: true
+          user_name: "Haragam Deep Singh"
+          user_email: "haragam.22@gmail.com"

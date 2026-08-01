@@ -32,26 +32,39 @@ har_agam = {
 
 ### `> stack`
 
-<div style="display: flex; align-items: center; gap: 9px;">
-<div style="display: flex; align-items: center; width: 130px; flex-shrink: 0;"><b>Core</b></div>
-<img src="https://skillicons.dev/icons?i=python,cpp" style="margin: 0 9px;" />
-</div>
+**Core**
+<br/>
+![Python](https://img.shields.io/badge/Python-0d1117?style=for-the-badge&logo=python&logoColor=58A6FF&labelColor=161b22)
+![C++](https://img.shields.io/badge/C%2B%2B-0d1117?style=for-the-badge&logo=cplusplus&logoColor=58A6FF&labelColor=161b22)
 
-<div style="display: flex; align-items: center; gap: 9px;">
-<div style="display: flex; align-items: center; width: 130px; flex-shrink: 0;"><b>AI / ML</b></div>
-<img src="https://skillicons.dev/icons?i=pytorch,tensorflow,sklearn,opencv" height="48" style="margin: 0 9px;" />
-<img src="https://cdn.simpleicons.org/huggingface/FFD21E" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/kaggle/20BEFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/keras/D00000" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/numpy/FFFFFF" height="40" style="margin: 0 9px;" /> <img src="https://cdn.simpleicons.org/pandas/FFFFFF" height="40" style="margin: 0 9px;" />
-</div>
+**AI / ML**
+<br/>
+![PyTorch](https://img.shields.io/badge/PyTorch-0d1117?style=for-the-badge&logo=pytorch&logoColor=58A6FF&labelColor=161b22)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-0d1117?style=for-the-badge&logo=tensorflow&logoColor=58A6FF&labelColor=161b22)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-0d1117?style=for-the-badge&logo=scikitlearn&logoColor=58A6FF&labelColor=161b22)
+![OpenCV](https://img.shields.io/badge/OpenCV-0d1117?style=for-the-badge&logo=opencv&logoColor=58A6FF&labelColor=161b22)
+![Hugging Face](https://img.shields.io/badge/Hugging%20Face-0d1117?style=for-the-badge&logo=huggingface&logoColor=58A6FF&labelColor=161b22)
+![Kaggle](https://img.shields.io/badge/Kaggle-0d1117?style=for-the-badge&logo=kaggle&logoColor=58A6FF&labelColor=161b22)
+![Keras](https://img.shields.io/badge/Keras-0d1117?style=for-the-badge&logo=keras&logoColor=58A6FF&labelColor=161b22)
+![NumPy](https://img.shields.io/badge/NumPy-0d1117?style=for-the-badge&logo=numpy&logoColor=58A6FF&labelColor=161b22)
+![Pandas](https://img.shields.io/badge/Pandas-0d1117?style=for-the-badge&logo=pandas&logoColor=58A6FF&labelColor=161b22)
 
-<div style="display: flex; align-items: center; gap: 9px;">
-<div style="display: flex; align-items: center; width: 130px; flex-shrink: 0;"><b>Backend & infra</b></div>
-<img src="https://skillicons.dev/icons?i=fastapi,django,docker,aws,gcp,postgres,mongodb,redis" style="margin: 0 9px;" />
-</div>
+**Backend & infra**
+<br/>
+![FastAPI](https://img.shields.io/badge/FastAPI-0d1117?style=for-the-badge&logo=fastapi&logoColor=58A6FF&labelColor=161b22)
+![Django](https://img.shields.io/badge/Django-0d1117?style=for-the-badge&logo=django&logoColor=58A6FF&labelColor=161b22)
+![Docker](https://img.shields.io/badge/Docker-0d1117?style=for-the-badge&logo=docker&logoColor=58A6FF&labelColor=161b22)
+![AWS](https://img.shields.io/badge/AWS-0d1117?style=for-the-badge&logo=amazonaws&logoColor=58A6FF&labelColor=161b22)
+![GCP](https://img.shields.io/badge/GCP-0d1117?style=for-the-badge&logo=googlecloud&logoColor=58A6FF&labelColor=161b22)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-0d1117?style=for-the-badge&logo=postgresql&logoColor=58A6FF&labelColor=161b22)
+![MongoDB](https://img.shields.io/badge/MongoDB-0d1117?style=for-the-badge&logo=mongodb&logoColor=58A6FF&labelColor=161b22)
+![Redis](https://img.shields.io/badge/Redis-0d1117?style=for-the-badge&logo=redis&logoColor=58A6FF&labelColor=161b22)
 
-<div style="display: flex; align-items: center; gap: 9px;">
-<div style="display: flex; align-items: center; width: 130px; flex-shrink: 0;"><b>Tools</b></div>
-<img src="https://skillicons.dev/icons?i=git,github,githubactions" style="margin: 0 9px;" />
-</div>
+**Tools**
+<br/>
+![Git](https://img.shields.io/badge/Git-0d1117?style=for-the-badge&logo=git&logoColor=58A6FF&labelColor=161b22)
+![GitHub](https://img.shields.io/badge/GitHub-0d1117?style=for-the-badge&logo=github&logoColor=58A6FF&labelColor=161b22)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-0d1117?style=for-the-badge&logo=githubactions&logoColor=58A6FF&labelColor=161b22)
 
 ---
 

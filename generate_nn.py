@@ -19,6 +19,7 @@ If GH_PAT is missing or the API call fails, falls back to 0 contributions
 (logs a warning) rather than crashing the workflow.
 """
 import os
+import json
 import random
 import datetime
 import requests
@@ -86,8 +87,7 @@ def _fetch_contribution_days():
     return days
 
 
-def get_todays_contributions():
-    days = _fetch_contribution_days()
+def get_todays_contributions(days):
     today = datetime.date.today().isoformat()
     for day in days:
         if day["date"] == today:
@@ -95,8 +95,7 @@ def get_todays_contributions():
     return 0
 
 
-def get_current_streak():
-    days = _fetch_contribution_days()
+def get_current_streak(days):
     if not days:
         return 0
     by_date = {d["date"]: d["contributionCount"] for d in days}
@@ -112,8 +111,7 @@ def get_current_streak():
     return streak
 
 
-def get_last_30_days_contributions():
-    days = _fetch_contribution_days()
+def get_last_30_days_contributions(days):
     return days[-30:]
 
 
@@ -773,17 +771,20 @@ def build_rocket(streak):
 
 
 def main():
-    commits_today = get_todays_contributions()
+    # fetch each GitHub data source exactly once, reuse across every generator
+    days = _fetch_contribution_days()
+    repos = _fetch_user_repos()
+
+    commits_today = get_todays_contributions(days)
     sizes = layer_sizes(commits_today)
     nn_svg = build_svg(sizes)
 
-    last_30 = get_last_30_days_contributions()
+    last_30 = get_last_30_days_contributions(days)
     chart_svg = build_contribution_chart(last_30)
 
-    repos = _fetch_user_repos()
     core_svg = build_core_telemetry(repos)
 
-    streak = get_current_streak()
+    streak = get_current_streak(days)
     rocket_svg = build_rocket(streak)
 
     os.makedirs("dist", exist_ok=True)
@@ -796,6 +797,16 @@ def main():
     for path, svg in outputs.items():
         with open(path, "w", encoding="utf-8") as f:
             f.write(svg)
+
+    # always-changing file: guarantees the daily commit step has a real diff
+    # even on a quiet day where every generated SVG comes out byte-identical
+    with open("dist/last-updated.json", "w", encoding="utf-8") as f:
+        json.dump({
+            "generated_at": datetime.datetime.utcnow().isoformat() + "Z",
+            "todays_contributions": commits_today,
+            "current_streak": streak,
+        }, f, indent=2)
+
     print(f"today's contributions: {commits_today} -> layer sizes {sizes}")
     print(f"30-day chart points: {len(last_30)}, repos: {len(repos)}")
     print(f"current streak: {streak} -> side-engine boosters {'on' if streak > 0 else 'off'}")
