@@ -8,12 +8,12 @@ inline SVG/HTML, not linked image files.
 """
 
 W, H = 1000, 320
-BG = "#fbf3f1"
-BONE = "#3a2c2c"
-RULE = "#e6d3cf"
-MUTED = "#9c8783"
-DIM = "#b39d98"
-ACCENT = "#c96a7c"
+BG = "#0d1117"
+BONE = "#e6edf3"
+RULE = "#30363d"
+MUTED = "#8b949e"
+DIM = "#6e7681"
+ACCENT = "#79c0ff"
 
 NAME = "Har Agam Deep Singh"
 ROLE = "Machine Learning & Generative AI Developer."
