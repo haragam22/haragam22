@@ -8,16 +8,6 @@
 
 ---
 
-<div align="center">
-
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/neural-network.svg" width="100%" alt="an animated neural network forward pass — a wave of activation sweeps layer by layer, node brightness reflects each weight, and the output assembles into a picture at the end"/>
-
-<sub>live network, regenerated daily — <b>the hidden layers grow or shrink with how much I committed that day</b>, and what you're watching is an actual forward pass, not a loop of random flashes</sub>
-
-</div>
-
----
-
 ### `> whoami`
 
 ```python
@@ -32,13 +22,11 @@ har_agam = {
 
 ---
 
-### `> telemetry`
-
 <div align="center">
 
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/contribution-telemetry.svg" width="100%" alt="30-day contribution telemetry chart" />
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/neural-network.svg" width="100%" alt="an animated neural network forward pass — a wave of activation sweeps layer by layer, node brightness reflects each weight, and the output assembles into a picture at the end"/>
 
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/core-telemetry.svg" width="100%" alt="GitHub core telemetry panel" />
+<sub>live network, regenerated daily — <b>the hidden layers grow or shrink with how much I committed that day</b>, and what you're watching is an actual forward pass, not a loop of random flashes</sub>
 
 </div>
 
@@ -69,15 +57,43 @@ har_agam = {
 
 ---
 
+### `> telemetry`
+
+<div align="center">
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/contribution-telemetry.svg" width="100%" alt="30-day contribution telemetry chart" />
+
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/core-telemetry.svg" width="100%" alt="GitHub core telemetry panel" />
+
+</div>
+
+---
+
+### `> currently`
+
+```python
+now = {
+    "building" : "multi-agent + adversarial ML systems",
+    "reading"  : "mech interp papers",
+    "goal"     : "land an AI/ML or GenAI internship, ship something that outlasts the semester",
+}
+```
+
+---
+
 ### `> pinned.projects`
 
-| project | what it does | stack |
-|---|---|---|
-| **Devlens** — backend lead | AI codebase navigator: deterministic AST parsing + hybrid vector search mapping 500+ dependencies/issues; agentic backend explains architectural intent, cut onboarding time ~60% | `Python` `AST` `vector search` `LLMs` |
-| **Jal Drishti** — ML lead | real-time underwater CV surveillance, YOLOv8 + FUnIE-GAN, 89%+ mAP across 5 threat classes; dual-mode backend with <80ms WebSocket telemetry | `YOLOv8` `FUnIE-GAN` `WebSockets` |
-| **DebateMind** — backend & ML | autonomous AI debate framework, RL-optimized LLM reasoning backed by a real-time RAG pipeline for fact-checking | `RL` `RAG` `LLMs` |
-| **ClauseCraft AI** — project lead | multi-agent policy navigator (RAG + deterministic NLP validation), cut manual eligibility-check time ~70% across 10+ simultaneous docs | `RAG` `multi-agent` `NLP` |
-| **DropDrive** — backend research | MERN + C++ secure data-wiping tool, NIST SP 800-88 compliant; shortlisted, Smart India Hackathon | `MERN` `C++` |
+<div align="center">
+
+<img src="dist/pinned-projects.svg" width="100%" alt="five pinned project cards — Devlens, Jal Drishti, DebateMind, ClauseCraft AI, DropDrive — each with role, description, and tech tags" />
+
+[![Devlens](https://img.shields.io/badge/Devlens-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/devlens)
+[![Jal Drishti](https://img.shields.io/badge/Jal%20Drishti-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/jal-drishti)
+[![DebateMind](https://img.shields.io/badge/DebateMind-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/debatemind)
+[![ClauseCraft AI](https://img.shields.io/badge/ClauseCraft%20AI-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/clausecraft-ai)
+[![DropDrive](https://img.shields.io/badge/DropDrive-0d1117?style=for-the-badge&labelColor=161b22&color=0d1117)](https://github.com/haragam22/dropdrive)
+
+</div>
 
 ---
 
@@ -95,24 +111,6 @@ achievements = [
 
 ---
 
-### `> currently`
-
-```python
-now = {
-    "building" : "multi-agent + adversarial ML systems",
-    "reading"  : "mech interp papers",
-    "goal"     : "land an AI/ML or GenAI internship, ship something that outlasts the semester",
-}
-```
-
----
-
-<div align="center">
-<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/rocket.svg" width="100%" alt="pixel-art rocket assembling from current GitHub streak, then launching and flying off frame" />
-</div>
-
----
-
 ### `> contact.init()`
 
 <div align="center">
@@ -127,4 +125,10 @@ now = {
 
 <div align="center">
 <sub><code>// backend by day, gradients by night</code></sub>
+</div>
+
+---
+
+<div align="center">
+<img src="https://raw.githubusercontent.com/haragam22/haragam22/output/rocket.svg" width="100%" alt="pixel-art rocket assembling from current GitHub streak, then launching and flying off frame" />
 </div>
